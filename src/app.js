@@ -11,6 +11,8 @@ import { nodeEnv, port } from "./config/initialConfig.js";
 import { connectDB } from "./config/dbConfig.js";
 import "./models/models.js";
 import authRoutes from "./routes/authRoutes.js"; // Make sure you have this import for auth routes
+import testRoute from "./routes/routes.js";
+import os from "os"
 
 // Initializing the app
 const app = express();
@@ -40,6 +42,14 @@ app.use(limiter);
 // Built-in middleware for parsing JSON
 app.use(express.json());
 
+// Route for root path
+app.get('/', (req, res) => {
+  res.send("Welcome to Agora Dance");
+});
+
+// other routes
+app.use("/test", testRoute)
+
 // Use authentication routes
 app.use("/api/auth", authRoutes);
 
@@ -55,7 +65,20 @@ app.use((err, req, res, next) => {
 // Database connection
 connectDB();
 
+// Function to get the IP address of the server
+function getIPAddress() {
+  const interfaces = os.networkInterfaces();
+  for (const iface of Object.values(interfaces)) {
+    for (const alias of iface) {
+      if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+        return alias.address;
+      }
+    }
+  }
+  return '0.0.0.0'; // fallback in case IP address cannot be determined
+}
+
 // Server running
 app.listen(port, () => {
-  console.log(`${chalk.green.bold("Server")} is listening on port ${port}`);
+  console.log(chalk.bgYellow.bold(` Server is listening at http://${getIPAddress()}:${port} `));
 });

@@ -10,12 +10,15 @@ export const connectDB = async () => {
     // Connect to the database with the provided URL and name
     await sequelize.authenticate();
     // Log success message in green
-    console.log(`${chalk.green.bold("Connected")} to the database`);
+    console.log(`${chalk.green.bold("Connected to the database")}`);
+    console.log(`${chalk.green.bold("============================================================")}`);
     await sequelize.sync();
-    console.log(`${chalk.green.bold("Models synced")} successfully`);
+    console.log(`${chalk.green.bold("Models synced successfully")}`);
+    console.log(`${chalk.green.bold("============================================================")}`);
   } catch (error) {
     // Log error message in red and exit the application
     console.log(`${chalk.red.bold("Error")} connecting to database `, error);
+    console.log(`${chalk.green.bold("============================================================")}`);
     process.exit(1);
   }
 };
