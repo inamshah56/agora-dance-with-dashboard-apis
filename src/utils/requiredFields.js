@@ -1,4 +1,4 @@
-import { frontError } from "./responses"
+import { frontError } from "./responses.js"
 
 const queryReqFields = (req, res, field_list) => {
     for (const field of field_list) {
@@ -14,7 +14,7 @@ const queryReqFields = (req, res, field_list) => {
 const bodyReqFields = (req, res, field_list) => {
     let resObj = {};
     for (const field of field_list) {
-        if (!req.body[field] || req.body[field].trim() == '') {
+        if (!req.body[field] || req.body[field] == '') {
             resObj[[field]] = "This field is required.";
         }
     }
@@ -23,4 +23,8 @@ const bodyReqFields = (req, res, field_list) => {
     else return { error: false, resData: {} };
 };
 
-module.exports = { queryReqFields, bodyReqFields };
+export {
+    queryReqFields,
+    bodyReqFields
+};
+

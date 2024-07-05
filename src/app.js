@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser";
 import { nodeEnv, port } from "./config/initialConfig.js";
 import { connectDB } from "./config/dbConfig.js";
 import "./models/models.js";
-import authRoutes from "./routes/authRoutes.js"; // Make sure you have this import for auth routes
+import authRoutes from "./routes/auth/auth.route.js"; // Make sure you have this import for auth routes
 import testRoute from "./routes/routes.js";
 import os from "os"
 

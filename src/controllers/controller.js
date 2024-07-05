@@ -1,4 +1,4 @@
-import { successResponse } from "../utils/responses.js";
+import { successOk } from "../utils/responses.js";
 
 // test controller
 export async function test(req, res) {
@@ -8,7 +8,8 @@ export async function test(req, res) {
         const data = {
             name: name
         }
-        successResponse(res, `Welcome ${name} to Agora Dance!!!`, data)
+        console.log('data', data)
+        successOk(res, `Welcome ${name} to Agora Dance!!!`)
     } catch (error) {
         // Handle any errors that occur during the registration process
         res.status(500).json({ message: "Server Error" });

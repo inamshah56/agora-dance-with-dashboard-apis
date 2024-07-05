@@ -2,20 +2,6 @@
 // ===================== success responses ========================
 // ================================================================
 
-const successResponse = (res, message, data = null) => {
-    const response = {
-        success: true,
-        message: message,
-    };
-    if (data !== null) {
-        response.data = data;
-    }
-    return res.status(200).send(response);
-};
-
-
-// ========================== successOk ===========================
-
 const successOk = (res, message) => {
     return res.status(200).send({
         success: true,
@@ -118,7 +104,6 @@ const conflictError = (res, message) => {
 // ================================================================
 
 export {
-    successResponse,
     successOk,
     successOkWithData,
     created,

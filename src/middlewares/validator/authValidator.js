@@ -1,4 +1,5 @@
 import { body, validationResult } from "express-validator";
+import { frontError } from "../../utils/responses.js";
 
 export const validateUserRegister = [
   [
@@ -11,6 +12,7 @@ export const validateUserRegister = [
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
+      // return frontError(res, "this is required", 'email')
     }
     next();
   },
