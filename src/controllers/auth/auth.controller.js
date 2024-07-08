@@ -1,14 +1,20 @@
-import jwt from "jsonwebtoken";
-import User from "../../models/user/user.model.js";
-import { jwtSecret } from "../../config/initialConfig.js";
-import { hashPassword, comparePassword } from "../../utils/passwordUtils.js";
-
-import { created, frontError, catchError, validationError, createdWithData, successOk } from "../../utils/responses.js";
-import { convertToLowercase, validateEmail, validatePassword } from '../../utils/utils.js';
-import { queryReqFields, bodyReqFields } from "../../utils/requiredFields.js"
-import { Sequelize } from "sequelize";
-import nodemailer from 'nodemailer';
 import crypto from "crypto"
+import bcrypt from "bcryptjs";
+import nodemailer from 'nodemailer';
+import { Sequelize } from "sequelize";
+import User from "../../models/user/user.model.js";
+import { bodyReqFields } from "../../utils/requiredFields.js"
+import { convertToLowercase, validateEmail, validatePassword } from '../../utils/utils.js';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwtTokenGenerator.js"
+import {
+  created,
+  frontError,
+  catchError,
+  validationError,
+  successOk,
+  successOkWithData,
+  UnauthorizedError
+} from "../../utils/responses.js";
 
 // ========================= nodemailer configuration ===========================
 
@@ -16,22 +22,20 @@ import crypto from "crypto"
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'your-email@gmail.com',
-    pass: 'your-email-password'
+    user: 'agoradance.app@gmail.com',
+    pass: process.env.EMAIL_PASS
   }
 });
 
 const sendOTPEmail = async (email, otp) => {
   try {
-    // Define email options
     const mailOptions = {
-      from: 'your-email@gmail.com',
+      from: 'agoradance.app@gmail.com',
       to: email,
       subject: 'Agora Dance - OTP Verification',
       text: `Your OTP for Agora Dance is ${otp}.`
     };
 
-    // Send email
     await transporter.sendMail(mailOptions);
     console.log(`OTP email sent successfully to ${email}`);
     return true; // Return true if email sent successfully
@@ -43,7 +47,6 @@ const sendOTPEmail = async (email, otp) => {
 
 // ========================= registerUser ===========================
 
-// Handles new user registration
 export async function registerUser(req, res) {
   try {
     const reqBodyFields = bodyReqFields(req, res, [
@@ -56,11 +59,10 @@ export async function registerUser(req, res) {
       "confirmPassword",
       "fcmToken",
     ]);
-    const reqData = convertToLowercase(req.body, ['password', 'confirmPassword'])
+    const reqData = convertToLowercase(req.body, ['password', 'confirmPassword', 'email'])
     const {
       firstName, lastName, age, gender, email, password, confirmPassword, fcmToken
     } = reqData;
-
 
     if (reqBodyFields.error) return reqBodyFields.resData;
 
@@ -73,11 +75,6 @@ export async function registerUser(req, res) {
 
     if (user) return validationError(res, "", "User already exists");
 
-    console.log("=====================");
-    console.log(password);
-    console.log(confirmPassword);
-    console.log("=====================");
-
     const invalidEmail = validateEmail(email)
     if (invalidEmail) return validationError(res, invalidEmail)
 
@@ -85,7 +82,7 @@ export async function registerUser(req, res) {
     if (invalidPassword) return validationError(res, invalidPassword)
 
     if (password !== confirmPassword) {
-      throw new Error('Password confirmation does not match password');
+      throw new Error('Password and Confirm Password do not match.');
     }
 
     const userData = {
@@ -98,14 +95,10 @@ export async function registerUser(req, res) {
       fcm_token: fcmToken
     }
 
-    console.log(' ======= userData ======== ', userData);
-
-
     await User.create(userData)
 
     return created(res, "User created successfully")
   } catch (error) {
-    console.log(error)
     if (error instanceof Sequelize.ValidationError) {
       const errorMessage = error.errors[0].message;
       const key = error.errors[0].path
@@ -131,48 +124,214 @@ export async function loginUser(req, res) {
       return validationError(res, "user not found")
     }
 
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return validationError(res, "Invalid credentials");
+    }
+
+    // Generate tokens
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    // If passwords match, return success
+    return successOkWithData(res, "Login successful", { accessToken, refreshToken });
+  } catch (error) {
+    catchError(res, error);
+  }
+}
+
+// ========================= regenerateAccessToken ===========================
+
+export async function regenerateAccessToken(req, res) {
+  try {
+
+    const { refreshToken } = req.body;
+    if (!refreshToken) frontError(res, "this is required", "refreshToken")
+
+    const decoded = verifyRefreshToken(refreshToken);
+
+    if (!decoded) {
+      return validationError(res, "Invalid refresh token");
+    }
+
+    const newAccessToken = generateAccessToken({ uuid: decoded.userUid });
+
+    return successOkWithData(res, "Access Token Generated Successfully", { accessToken: newAccessToken });
+  } catch (error) {
+    catchError(res, error);
+  }
+};
+
+// ========================= updatePassword ===========================
+
+// API endpoint to set new password after OTP verification
+export async function updatePassword(req, res) {
+  try {
+    const reqBodyFields = bodyReqFields(req, res, ["oldPassword", "newPassword", "confirmPassword", "email"]);
+    if (reqBodyFields.error) return reqBodyFields.resData;
+
+    const { oldPassword, newPassword, confirmPassword, email } = req.body;
+
+    // Check if a user with the given email exists
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) {
+      return validationError(res, "user not found")
+    }
+
+    // Compare oldPassword with hashed password in database
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return validationError(res, 'Invalid old password', "oldPassword");
+    }
+
+    // Check if passwords match
+    if (newPassword !== confirmPassword) {
+      return validationError(res, "Password and Confirm Password do not match.");
+    }
+
+    // Check if oldPassword and newPassword are the same
+    if (oldPassword === newPassword) {
+      return validationError(res, 'New password must be different from old password');
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // // Update user's password in the database
+    await User.update({ password: hashedPassword }, {
+      where: { email }
+    });
+
+    return successOk(res, "Password updated successfully.");
+  } catch (error) {
+    catchError(res, error);
+  }
+}
+
+// ========================= forgotPassword ===========================
+
+export async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+    if (!email) return frontError(res, "this is required", "email")
+
+    // Check if a user with the given email exists
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) {
+      return validationError(res, "user not found")
+    }
+
     // generating otp 
     const otp = crypto.randomInt(100000, 999999);
     const expiry = new Date();
     expiry.setSeconds(expiry.getSeconds() + 60);
 
-    // implement sending mail logic here
+    // Send OTP email
     const emailSent = await sendOTPEmail(email, otp);
+
     if (emailSent) {
       const otpData = {
         otp,
         expiry,
-        otp_count: Sequelize.literal('otp_count + 1')
+        otp_count: 0
       }
       // Save OTP in the database
       await User.update(otpData, {
         where: { email },
       });
-      console.log('OTP sent successfully.');
+      req.user = { email }
       return successOk(res, "OTP sent successfully")
     } else {
-      // Handle failure to send email
-      console.log('Failed to send OTP.');
+      return catchError(res, "Something went wrong. Failed to send OTP.")
     }
   } catch (error) {
-    // Handle any errors that occur during the registration process
     catchError(res, error);
   }
 }
 
-// configure gmail to send otp --pending
+// ========================= verifyOtp ===========================
 
+// Handles verify otp
+export async function verifyOtp(req, res) {
+  try {
+    const { email, otp } = req.body;
+    if (!email) return frontError(res, "this is required", "email")
+    if (!otp) return frontError(res, "this is required", "otp")
 
-// // Compare the provided password with the stored hashed password using the comparePassword function
-// const isMatch = await comparePassword(password, user.password);
-// if (!isMatch) {
-//   return validationError(res, "Invalid Credentials")
-// }
+    // Check if a user with the given email exists
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) {
+      return validationError(res, "user not found")
+    }
 
-// // Create a JWT payload and generate a token
-// const payload = { userId: user._id };
-// const token = jwt.sign(payload, jwtSecret, {
-//   expiresIn: "1h",
-// });
-// // Respond with the generated token
-// res.json({ token });
+    if (user.otp_count >= 3) {
+      return validationError(res, "Maximum OTP attempts reached. Please regenerate OTP.");
+    }
+
+    // Compare OTP if does'nt match increment otp_count
+    if (user.otp !== parseInt(otp, 10)) {
+      await User.update(
+        {
+          otp_count: Sequelize.literal('otp_count + 1'),
+        },
+        { where: { email } },
+      );
+      return validationError(res, 'Invalid OTP');
+    }
+
+    // OTP matched, set can_change_password to true
+    await User.update(
+      { can_change_password: true },
+      { where: { email } }
+    );
+
+    return successOk(res, "OTP Verified Successfully");
+  } catch (error) {
+    catchError(res, error);
+  }
+}
+
+// ========================= setNewPassword ===========================
+
+// API endpoint to set new password after OTP verification
+export async function setNewPassword(req, res) {
+  try {
+    const reqBodyFields = bodyReqFields(req, res, ["newPassword", "confirmPassword", "email"]);
+    if (reqBodyFields.error) return reqBodyFields.resData;
+
+    const { newPassword, confirmPassword, email } = req.body;
+
+    // Check if a user with the given email exists
+    const user = await User.findOne({ where: { email: email } });
+    if (!user) {
+      return validationError(res, "user not found")
+    }
+
+    // Check if passwords match
+    if (newPassword !== confirmPassword) {
+      return validationError(res, "Password and Confirm Password do not match.");
+    }
+
+    // only allow if can_change_password is true , i.e otp verified
+    if (user.can_change_password === false) {
+      return UnauthorizedError(res, "Unauthorized");
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update user's password in the database
+    await User.update({ password: hashedPassword, can_change_password: false }, {
+      where: { email }
+    });
+
+    return successOk(res, "Password updated successfully.");
+  } catch (error) {
+    catchError(res, error);
+  }
+}
+
+// ===================================================================

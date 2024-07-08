@@ -83,6 +83,24 @@ const backError = (res, message, field) => {
     });
 };
 
+// ============================ authenticationError ==========================
+
+const UnauthorizedError = (res, message) => {
+    return res.status(401).json({
+        success: false,
+        message: message || 'Unauthorized',
+    });
+}
+
+// ============================ authenticationError ==========================
+
+const forbiddenError = (res, message) => {
+    return res.status(403).json({
+        success: false,
+        message: message || 'Forbidden',
+    });
+}
+
 // ============================ notFound ==========================
 
 const notFound = (res, message) => {
@@ -113,5 +131,7 @@ export {
     frontError,
     backError,
     notFound,
-    conflictError
+    conflictError,
+    UnauthorizedError,
+    forbiddenError
 };

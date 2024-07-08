@@ -4,6 +4,11 @@ import bcrypt from "bcryptjs"
 
 // Define a schema for the user with email and password fields
 const User = sequelize.define('user', {
+    uuid: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+    },
     email: {
         type: DataTypes.STRING,
         allowNull: false, // Makes this field mandatory
@@ -39,6 +44,10 @@ const User = sequelize.define('user', {
         type: DataTypes.INTEGER,
         defaultValue: 0
     },
+    can_change_password: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
     level: {
         type: DataTypes.ENUM('initial', 'advanced', 'pro'),
         defaultValue: 'initial'
@@ -60,6 +69,7 @@ const User = sequelize.define('user', {
             },
             beforeUpdate: async (user) => {
                 if (user.changed('password')) {
+                    console.log("password update hook called");
                     const salt = await bcrypt.genSalt(12);
                     user.password = await bcrypt.hash(user.password, salt);
                 }

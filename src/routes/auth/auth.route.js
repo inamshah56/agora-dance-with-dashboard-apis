@@ -1,18 +1,22 @@
 // Import required modules and configuration
 import express from "express";
-import { loginUser, registerUser } from "../../controllers/auth/auth.controller.js";
-import { validateUserLogin, validateUserRegister } from "../../middlewares/validator/authValidator.js";
+import { loginUser, registerUser, forgotPassword, verifyOtp, setNewPassword, regenerateAccessToken, updatePassword } from "../../controllers/auth/auth.controller.js";
+import verifyToken from "../../middlewares/authMiddleware.js";
 
-// Create a new router instance
 const router = express.Router();
 
-// Register route with input validation followed by the registration controller
-// router.post("/register", validateUserRegister, registerUser);
 router.post("/register", registerUser);
 
-// Login route with input validation followed by the login controller
-// router.post("/login", validateUserLogin, loginUser);
 router.post("/login", loginUser);
 
-// Export the router for use in the main application file
+router.post("/regenerate-access-token", verifyToken, regenerateAccessToken);
+
+router.post("/update-password", verifyToken, updatePassword);
+
+router.post("/forgot-password", verifyToken, forgotPassword);
+
+router.post("/verify-otp", verifyToken, verifyOtp);
+
+router.post("/new-password", verifyToken, setNewPassword);
+
 export default router;

@@ -1,23 +1,24 @@
 import jwt from "jsonwebtoken";
-import { jwtSecret } from "../config/initialConfig.js";
+import { UnauthorizedError, forbiddenError } from "../utils/responses.js";
 
 // Middleware to validate JWT tokens
-export default function auth(req, res, next) {
-  // Extract the token from the Authorization header
-  const token = req.header("Authorization").replace("Bearer ", "");
-
-  // Deny access if the token is not provided
-  if (!token) {
-    return res.status(401).json({ message: "No token, authorization denied" });
-  }
-
+export default function verifyToken(req, res, next) {
   try {
-    // Verify the token using the secret key
-    const decoded = jwt.verify(token, jwtSecret);
-    req.user = decoded.userId; // Attach the user ID to the request object
-    next(); // Proceed to the next middleware or route handler
+
+    // Extract the token from the Authorization header
+    const token = req.header("Authorization").replace("Bearer ", "");
+
+    if (!token) {
+      return forbiddenError(res, 'No token, authorization denied');
+    }
+
+    console.log("Token :", token);
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded.user;
+    next();
   } catch (error) {
-    // Respond with an error if the token is invalid
-    res.status(401).json({ message: "Token is not valid" });
+    console.log("Token verification failed:", error);
+    return UnauthorizedError(res, "Token is not valid")
   }
 }
