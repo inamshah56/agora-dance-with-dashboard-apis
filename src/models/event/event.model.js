@@ -1,6 +1,5 @@
 import sequelize from '../../config/dbConfig.js';
 import { DataTypes } from 'sequelize';
-import bcrypt from "bcryptjs"
 
 // Event Schema
 const Event = sequelize.define('event', {
@@ -54,7 +53,6 @@ const Event = sequelize.define('event', {
     organizer_details: {
         type: DataTypes.TEXT,
     }
-}
-)
+});
 
-export default Event;
+export { Event };
