@@ -4,7 +4,7 @@ import { EventImages } from "../../models/event/eventImages.js";
 import { created, frontError, catchError, validationError, createdWithData, successOk, successOkWithData } from "../../utils/responses.js";
 import { convertToLowercase, validateEmail, validatePassword } from '../../utils/utils.js';
 import { bodyReqFields } from "../../utils/requiredFields.js"
-import { Sequelize } from "sequelize";
+import { Sequelize, Op } from "sequelize";
 
 // ========================= addEvent ===========================
 
@@ -15,7 +15,7 @@ export async function addEvent(req, res) {
         console.log("req.body", req.body);
         console.log("req.files", req.files);
         const reqBodyFields = bodyReqFields(req, res, [
-            "category",
+            "type",
             "style",
             "title",
             "description",
@@ -33,7 +33,7 @@ export async function addEvent(req, res) {
 
         const reqData = convertToLowercase(req.body)
         const {
-            category,
+            type,
             style,
             title,
             description,
@@ -58,7 +58,7 @@ export async function addEvent(req, res) {
         console.log("=====================");
 
         const eventData = {
-            category,
+            type,
             style,
             title,
             description,
@@ -148,7 +148,7 @@ export async function updateEvent(req, res) {
 
         const reqData = convertToLowercase(req.body)
         const {
-            category,
+            type,
             style,
             title,
             description,
@@ -167,7 +167,7 @@ export async function updateEvent(req, res) {
         console.log("=====================");
 
         const eventData = {
-            category,
+            type,
             style,
             title,
             description,
@@ -229,4 +229,60 @@ export async function deleteEvent(req, res) {
         catchError(res, error);
     }
 }
-// =========================  ===========================
+
+// ========================= getFilteredEvents ===========================
+
+export async function getFilteredEvents(req, res) {
+    try {
+        console.log('==== this is getFilteredEvents ====')
+        console.log('==== this is getFilteredEvents ====')
+        console.log('==== this is getFilteredEvents ====')
+        const { type, style, date, title } = req.query
+
+        console.log('==== req.query ====\n', req.query)
+
+        let filters = {}
+
+        if (type) {
+            const danceType = JSON.parse(type)
+            filters.type = {
+                [Op.in]: danceType
+            }
+        }
+
+        if (style) {
+            const danceStyle = JSON.parse(style)
+            filters.style = {
+                [Op.in]: danceStyle
+            }
+        }
+
+        if (date) { filters.date = date }
+
+        if (title) {
+            filters.title = {
+                [Op.iLike]: `%${title}%`
+            };
+        }
+
+        console.log('==== filters ====\n', filters)
+
+        const event = await Event.findAll({
+            where: filters,
+            include: [{
+                model: EventImages,
+                as: 'event_images', // Assuming you have defined an association alias 'images'
+                attributes: ['imageUrl'] // Optionally, specify which attributes to include from Image model
+            }]
+        });
+        console.log('==== event ====\n', event)
+        if (!event || (Array.isArray(event) && event.length === 0)) {
+            return successOk(res, 'No events found');
+        }
+
+        return successOkWithData(res, "Filtered Events Fetched Successfully", event)
+    } catch (error) {
+        console.log(error)
+        catchError(res, error);
+    }
+}

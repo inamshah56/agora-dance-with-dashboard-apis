@@ -19,5 +19,5 @@ export { EventImages };
 // Associations
 Event.EventImages = Event.hasMany(EventImages, { onDelete: 'CASCADE', foreignKey: 'event_uuid', sourceKey: 'uuid', as: 'event_images' });
 EventImages.Event = EventImages.belongsTo(Event, {
-    foreignKey: 'event_uuid', targetKey: 'uuid', as: 'evenst'
+    foreignKey: 'event_uuid', targetKey: 'uuid', as: 'event'
 });

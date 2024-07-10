@@ -8,13 +8,13 @@ const Event = sequelize.define('event', {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    category: {
+    type: {
         type: DataTypes.ENUM('academy', 'concert', 'congress', 'social'),
         allowNull: false,
         validate: {
             isIn: {
                 args: [['academy', 'concert', 'congress', 'social']],
-                msg: "Category must be one of the following: academy, concert, congress, or social."
+                msg: "Type must be one of the following: academy, concert, congress, or social."
             }
         },
     },
