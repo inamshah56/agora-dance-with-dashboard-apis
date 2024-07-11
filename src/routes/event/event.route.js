@@ -1,27 +1,36 @@
 // Import required modules and configuration
 import express from "express";
-import { addEvent, deleteEvent, getEvent, getFilteredEvents, updateEvent } from "../../controllers/event/event.controller.js";
+import { addEvent, deleteEvent, getEvent, getFilteredEvents, updateEvent, addToFavourites, removeFromFavourites } from "../../controllers/event/event.controller.js";
 import multer from 'multer';
-// import { upload } from '../../config/multer.js'
 import storage from '../../config/multer.js';
+import verifyToken from "../../middlewares/authMiddleware.js";
+
 // Create a new router instance
 const router = express.Router();
 const upload = multer({ storage });
 
-router.post("/add",
+// ========================= events routes ===========================
+
+router.post("/add", verifyToken,
     upload.fields([{ name: 'images', maxCount: 5 }]),
     addEvent);
 
 
-router.get("/get", getEvent);
+router.get("/get", verifyToken, getEvent);
 
-router.patch("/update",
+router.patch("/update", verifyToken,
     upload.fields([{ name: 'images', maxCount: 5 }]),
     updateEvent);
 
-router.delete("/delete", deleteEvent);
+router.delete("/delete", verifyToken, deleteEvent);
 
-router.get("/filtered", getFilteredEvents);
+router.get("/filtered", verifyToken, getFilteredEvents);
+
+// ======================= fourite events routes ======================
+
+router.post("/add-to-favourites", verifyToken, addToFavourites);
+
+router.delete("/remove-from-favourites", verifyToken, removeFromFavourites);
 
 // Export the router for use in the main application file
 export default router; 

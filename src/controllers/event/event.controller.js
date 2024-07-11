@@ -1,6 +1,6 @@
 import { Event } from "../../models/event/event.model.js";
-import { EventImages } from "../../models/event/eventImages.js";
-
+import { EventImages } from "../../models/event/eventImages.model.js";
+import { FavouriteEvents } from "../../models/event/favourites.model.js";
 import { created, frontError, catchError, validationError, createdWithData, successOk, successOkWithData } from "../../utils/responses.js";
 import { convertToLowercase, validateEmail, validatePassword } from '../../utils/utils.js';
 import { bodyReqFields } from "../../utils/requiredFields.js"
@@ -237,11 +237,29 @@ export async function getFilteredEvents(req, res) {
         console.log('==== this is getFilteredEvents ====')
         console.log('==== this is getFilteredEvents ====')
         console.log('==== this is getFilteredEvents ====')
-        const { type, style, date, title } = req.query
+        const { type, style, date, title, location } = req.query
 
         console.log('==== req.query ====\n', req.query)
 
         let filters = {}
+
+        if (title) {
+            filters.title = {
+                [Op.like]: `%${title}%`
+            };
+        }
+
+        if (location) {
+            const locationCordinates = JSON.parse(location)
+            const lat = locationCordinates[0]
+            const lon = locationCordinates[1]
+
+            // Filter events based on proximity to user-provided location within a 0.05 degree (5000 meters     ) radius
+            filters.distance_in_degrees = Sequelize.literal(
+                `ST_Distance(location, ST_SetSRID(ST_MakePoint(${lat}, ${lon}), 4326)) < 0.05`,
+                true
+            );
+        }
 
         if (type) {
             const danceType = JSON.parse(type)
@@ -259,12 +277,6 @@ export async function getFilteredEvents(req, res) {
 
         if (date) { filters.date = date }
 
-        if (title) {
-            filters.title = {
-                [Op.iLike]: `%${title}%`
-            };
-        }
-
         console.log('==== filters ====\n', filters)
 
         const event = await Event.findAll({
@@ -281,6 +293,49 @@ export async function getFilteredEvents(req, res) {
         }
 
         return successOkWithData(res, "Filtered Events Fetched Successfully", event)
+        // return successOk(res, "ytrkl;djkhaldhvdljsvhasdljhvadljhavd")
+    } catch (error) {
+        console.log(error)
+        catchError(res, error);
+    }
+}
+
+// ========================= addToFavourites ===========================
+
+export async function addToFavourites(req, res) {
+    try {
+        const { eventUuid } = req.query
+        const userUid = req.user
+
+        if (!eventUuid) {
+            return frontError(res, 'this is required', "eventUuid")
+        }
+
+        const addedtoFavourites = await FavouriteEvents.create({ event_uuid: eventUuid, user_uuid: userUid })
+
+        return successOkWithData(res, "Event Added to Favourites", addedtoFavourites)
+    } catch (error) {
+        console.log(error)
+        catchError(res, error);
+    }
+}
+
+// ========================= removeFromFavourites ===========================
+
+export async function removeFromFavourites(req, res) {
+    try {
+        const { uuid } = req.query
+
+        if (!uuid) {
+            return frontError(res, 'this is required', "uuid")
+        }
+
+        const favouriteEvent = await FavouriteEvents.findOne({ where: { uuid } });
+        if (!favouriteEvent) {
+            return frontError(res, 'invalid uuid', 'uuid');
+        }
+        await favouriteEvent.destroy();
+        return successOk(res, "Event Removed from Favourites")
     } catch (error) {
         console.log(error)
         catchError(res, error);

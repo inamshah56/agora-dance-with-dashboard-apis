@@ -12,10 +12,10 @@ export default function verifyToken(req, res, next) {
       return forbiddenError(res, 'No token, authorization denied');
     }
 
-    console.log("Token :", token);
+    // console.log("Token :", token);
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded.user;
+    req.user = decoded.userUid; // userUid is uuid
     next();
   } catch (error) {
     console.log("Token verification failed:", error);

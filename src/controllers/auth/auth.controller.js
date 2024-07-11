@@ -2,7 +2,7 @@ import crypto from "crypto"
 import bcrypt from "bcryptjs";
 import nodemailer from 'nodemailer';
 import { Sequelize } from "sequelize";
-import User from "../../models/user/user.model.js";
+import { User } from "../../models/user/user.model.js";
 import { bodyReqFields } from "../../utils/requiredFields.js"
 import { convertToLowercase, validateEmail, validatePassword } from '../../utils/utils.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwtTokenGenerator.js"
