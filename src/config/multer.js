@@ -1,4 +1,4 @@
-// src/config/multer.js
+// multer configuration for events
 
 import { diskStorage } from 'multer';
 import { mkdirSync } from 'fs';

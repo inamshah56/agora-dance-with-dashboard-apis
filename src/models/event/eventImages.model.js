@@ -9,7 +9,7 @@ const EventImages = sequelize.define('event_image', {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    imageUrl: {
+    image_url: {
         type: DataTypes.STRING,
         allowNull: false,
     },

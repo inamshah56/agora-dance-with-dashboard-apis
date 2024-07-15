@@ -46,4 +46,40 @@ const validatePassword = (password) => {
     }
 };
 
-export { convertToLowercase, validateEmail, validatePassword };
+// ============================ validatePhone =================================
+
+const validPhoneRegex = /^\+34\d{9}$/;
+const validatePhone = (phoneNumber) => {
+    if (!phoneNumber) {
+        return "Phone number is required";
+    }
+    if (!phoneNumber.startsWith('+34')) {
+        return "The phone number must start with '+34'";
+    }
+    if (phoneNumber.length !== 12) {
+        return "The phone number must be 12 characters long";
+    }
+    if (!validPhoneRegex.test(phoneNumber)) {
+        return "The phone number must follow the format '+34XXXXXXXXX' with exactly 9 digits after '+34'";
+    }
+};
+
+// ============================ calculateAge =================================
+
+const calculateAge = (dob) => {
+    const birthday = new Date(dob);
+    const today = new Date();
+
+    // Calculate age
+    let age = today.getFullYear() - birthday.getFullYear();
+    const monthDiff = today.getMonth() - birthday.getMonth();
+
+    // If birthday hasn't occurred yet this year, subtract one year
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthday.getDate())) {
+        age--;
+    }
+
+    return age;
+}
+
+export { convertToLowercase, validateEmail, validatePassword, validatePhone, calculateAge };

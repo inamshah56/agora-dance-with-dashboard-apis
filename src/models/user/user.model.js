@@ -24,8 +24,8 @@ const User = sequelize.define('user', {
     last_name: {
         type: DataTypes.STRING,
     },
-    age: {
-        type: DataTypes.INTEGER,
+    dob: {
+        type: DataTypes.DATEONLY, // Changed from INTEGER to DATEONLY
     },
     gender: {
         type: DataTypes.ENUM('male', 'female', 'other'),
@@ -36,6 +36,12 @@ const User = sequelize.define('user', {
                 msg: "Gender must be either 'male', 'female', or 'other'."
             }
         },
+    },
+    phone: {
+        type: DataTypes.STRING, // STRING type to accommodate '+' and numbers
+    },
+    profile_url: {
+        type: DataTypes.STRING,
     },
     otp: {
         type: DataTypes.INTEGER,

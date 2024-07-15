@@ -12,6 +12,7 @@ import { connectDB } from "./config/dbConfig.js";
 import "./models/models.js";
 import authRoutes from "./routes/auth/auth.route.js"; // Make sure you have this import for auth routes
 import eventRoutes from "./routes/event/event.route.js";
+import profileRoute from "./routes/profile/profile.route.js";
 import testRoute from "./routes/routes.js";
 import os from "os"
 
@@ -53,6 +54,7 @@ app.use("/api/auth", authRoutes);
 
 // other routes
 app.use("/api/test", testRoute)
+app.use("/api/profile", profileRoute)
 app.use("/api/event", eventRoutes)
 
 // Global error handler

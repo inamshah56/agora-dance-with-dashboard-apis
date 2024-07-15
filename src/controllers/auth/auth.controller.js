@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 import { Sequelize } from "sequelize";
 import { User } from "../../models/user/user.model.js";
 import { bodyReqFields } from "../../utils/requiredFields.js"
-import { convertToLowercase, validateEmail, validatePassword } from '../../utils/utils.js';
+import { convertToLowercase, validateEmail, validatePassword, validatePhone } from '../../utils/utils.js';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwtTokenGenerator.js"
 import {
   created,
@@ -52,8 +52,9 @@ export async function registerUser(req, res) {
     const reqBodyFields = bodyReqFields(req, res, [
       "firstName",
       "lastName",
-      "age",
+      "dob",
       "gender",
+      "phone",
       "email",
       "password",
       "confirmPassword",
@@ -61,7 +62,7 @@ export async function registerUser(req, res) {
     ]);
     const reqData = convertToLowercase(req.body, ['password', 'confirmPassword', 'email'])
     const {
-      firstName, lastName, age, gender, email, password, confirmPassword, fcmToken
+      firstName, lastName, dob, gender, phone, email, password, confirmPassword, fcmToken
     } = reqData;
 
     if (reqBodyFields.error) return reqBodyFields.resData;
@@ -81,6 +82,9 @@ export async function registerUser(req, res) {
     const invalidPassword = validatePassword(password)
     if (invalidPassword) return validationError(res, invalidPassword)
 
+    const invalidPhone = validatePhone(phone)
+    if (invalidPhone) return validationError(res, invalidPhone)
+
     if (password !== confirmPassword) {
       throw new Error('Password and Confirm Password do not match.');
     }
@@ -88,8 +92,9 @@ export async function registerUser(req, res) {
     const userData = {
       first_name: firstName,
       last_name: lastName,
-      age,
+      dob,
       gender,
+      phone,
       email,
       password,
       fcm_token: fcmToken
