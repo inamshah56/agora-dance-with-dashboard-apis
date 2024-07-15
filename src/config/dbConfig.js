@@ -3,6 +3,7 @@ import chalk from "chalk";
 import { Sequelize } from "sequelize";
 import { dbUrl } from "./initialConfig.js";
 
+console.log("db ===================: ", dbUrl)
 const sequelize = new Sequelize(dbUrl);
 // Async function to connect to the MongoDB database
 export const connectDB = async () => {
