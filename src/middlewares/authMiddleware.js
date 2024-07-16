@@ -6,11 +6,12 @@ export default function verifyToken(req, res, next) {
   try {
 
     // Extract the token from the Authorization header
-    const token = req.header("Authorization").replace("Bearer ", "");
+    let token = req.header("Authorization");
 
     if (!token) {
       return forbiddenError(res, 'No token, authorization denied');
     }
+    token = token.replace("Bearer ", "")
 
     // console.log("Token :", token);
 
