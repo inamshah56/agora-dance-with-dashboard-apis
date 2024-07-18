@@ -9,14 +9,14 @@ router.post("/register", registerUser);
 
 router.post("/login", loginUser);
 
-router.post("/regenerate-access-token", verifyToken, regenerateAccessToken);
+router.post("/regenerate-access-token", regenerateAccessToken);
 
 router.post("/update-password", verifyToken, updatePassword);
 
-router.post("/forgot-password", verifyToken, forgotPassword);
+router.post("/forgot-password", forgotPassword);
 
-router.post("/verify-otp", verifyToken, verifyOtp);
+router.post("/verify-otp", verifyOtp);
 
-router.post("/new-password", verifyToken, setNewPassword);
+router.post("/new-password", setNewPassword);
 
 export default router;

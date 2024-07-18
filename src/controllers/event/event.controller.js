@@ -10,12 +10,7 @@ import { Sequelize, Op } from "sequelize";
 
 export async function getFilteredEvents(req, res) {
     try {
-        console.log('==== this is getFilteredEvents ====')
-        console.log('==== this is getFilteredEvents ====')
-        console.log('==== this is getFilteredEvents ====')
-        const { type, style, date, title, location } = req.query
-
-        console.log('==== req.query ====\n', req.query)
+        const { type, style, date, title, location, city, province } = req.query
 
         let filters = {}
 
@@ -35,6 +30,14 @@ export async function getFilteredEvents(req, res) {
                 `ST_Distance(location, ST_SetSRID(ST_MakePoint(${lat}, ${lon}), 4326)) < 0.05`,
                 true
             );
+        }
+
+        if (city) {
+            filters.city = city
+        }
+
+        if (province) {
+            filters.province = province
         }
 
         if (type) {
@@ -63,10 +66,10 @@ export async function getFilteredEvents(req, res) {
                 attributes: ['imageUrl'] // Optionally, specify which attributes to include from Image model
             }]
         });
-        console.log('==== event ====\n', event)
-        if (!event || (Array.isArray(event) && event.length === 0)) {
-            return successOk(res, 'No events found');
-        }
+        // console.log('==== event ====\n', event)
+        // if (!event || (Array.isArray(event) && event.length === 0)) {
+        //     return successOk(res, 'No events found');
+        // }
 
         return successOkWithData(res, "Filtered Events Fetched Successfully", event)
         // return successOk(res, "ytrkl;djkhaldhvdljsvhasdljhvadljhavd")
@@ -110,6 +113,7 @@ export async function addEvent(req, res) {
             "title",
             "description",
             "date",
+            "time",
             "totalTickets",
             "lat",
             "lon",
@@ -128,6 +132,7 @@ export async function addEvent(req, res) {
             title,
             description,
             date,
+            time,
             totalTickets,
             lat,
             lon,
@@ -153,6 +158,7 @@ export async function addEvent(req, res) {
             title,
             description,
             date,
+            time,
             total_tickets: totalTickets,
             location: {
                 type: 'Point',
@@ -191,7 +197,7 @@ export async function addEvent(req, res) {
         if (error instanceof Sequelize.ValidationError) {
             const errorMessage = error.errors[0].message;
             const key = error.errors[0].path
-            validationError(res, key, errorMessage);
+            validationError(res, errorMessage, key);
         } else {
             catchError(res, error);
         }
@@ -307,12 +313,10 @@ export async function deleteEvent(req, res) {
 
 export async function getAllFavourites(req, res) {
     try {
-        console.log("===== getAllFavourites api hit =====")
-        console.log("===== getAllFavourites api hit =====")
-        console.log("===== getAllFavourites api hit =====")
+
         const userUid = req.user
         console.log("===== userUid ===== : ", userUid)
-        const { type, style, date, title, location } = req.query
+        const { type, style, date, title, location, city, province } = req.query
 
         console.log('==== req.query ====\n', req.query)
         let filters = {}
@@ -333,6 +337,14 @@ export async function getAllFavourites(req, res) {
                 `ST_Distance(location, ST_SetSRID(ST_MakePoint(${lat}, ${lon}), 4326)) < 0.05`,
                 true
             );
+        }
+
+        if (city) {
+            filters.city = city
+        }
+
+        if (province) {
+            filters.province = province
         }
 
         if (type) {
@@ -366,9 +378,9 @@ export async function getAllFavourites(req, res) {
             ]
         });
 
-        if (!favouriteEvents || (Array.isArray(favouriteEvents) && favouriteEvents.length === 0)) {
-            return successOk(res, 'No favourite events found');
-        }
+        // if (!favouriteEvents || (Array.isArray(favouriteEvents) && favouriteEvents.length === 0)) {
+        //     return successOk(res, 'No favourite events found');
+        // }
 
         return successOkWithData(res, "All Favourite Events Fetched Successfully", favouriteEvents)
     } catch (error) {

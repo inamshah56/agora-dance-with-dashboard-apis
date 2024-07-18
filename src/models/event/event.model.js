@@ -33,6 +33,10 @@ const Event = sequelize.define('event', {
         type: DataTypes.DATEONLY,
         allowNull: false
     },
+    time: {
+        type: DataTypes.TIME,
+        allowNull: false
+    },
     total_tickets: {
         type: DataTypes.INTEGER,
     },
