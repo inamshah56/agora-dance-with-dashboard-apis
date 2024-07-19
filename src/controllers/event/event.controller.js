@@ -1,10 +1,13 @@
-import { Event } from "../../models/event/event.model.js";
-import { EventImages } from "../../models/event/eventImages.model.js";
-import { FavouriteEvents } from "../../models/event/favourites.model.js";
-import { created, frontError, catchError, validationError, createdWithData, successOk, successOkWithData } from "../../utils/responses.js";
-import { convertToLowercase, validateEmail, validatePassword } from '../../utils/utils.js';
-import { bodyReqFields } from "../../utils/requiredFields.js"
 import { Sequelize, Op } from "sequelize";
+import { Event } from "../../models/event/event.model.js";
+import { bodyReqFields } from "../../utils/requiredFields.js"
+import { EventImages } from "../../models/event/images.model.js";
+import { FavouriteEvents } from "../../models/event/favourites.model.js";
+import { convertToLowercase, validateEmail, validatePassword } from '../../utils/utils.js';
+import { created, frontError, catchError, validationError, createdWithData, successOk, successOkWithData, notFound } from "../../utils/responses.js";
+import { Pass } from "../../models/event/pass.model.js";
+import { Room } from "../../models/event/rooms.model.js";
+import { Food } from "../../models/event/food.model.js";
 
 // ========================= getFilteredEvents ===========================
 
