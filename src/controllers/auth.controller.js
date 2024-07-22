@@ -2,10 +2,10 @@ import crypto from "crypto"
 import bcrypt from "bcryptjs";
 import nodemailer from 'nodemailer';
 import { Sequelize } from "sequelize";
-import { User } from "../../models/user/user.model.js";
-import { bodyReqFields } from "../../utils/requiredFields.js"
-import { convertToLowercase, validateEmail, validatePassword, validatePhone } from '../../utils/utils.js';
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwtTokenGenerator.js"
+import { User } from "../models/user.model.js";
+import { bodyReqFields } from "../utils/requiredFields.js"
+import { convertToLowercase, validateEmail, validatePassword, validatePhone } from '../utils/utils.js';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwtTokenGenerator.js"
 import {
 	created,
 	frontError,
@@ -14,7 +14,7 @@ import {
 	successOk,
 	successOkWithData,
 	UnauthorizedError
-} from "../../utils/responses.js";
+} from "../utils/responses.js";
 
 // ========================= nodemailer configuration ===========================
 
@@ -105,7 +105,7 @@ export async function registerUser(req, res) {
 		if (error instanceof Sequelize.ValidationError) {
 			const errorMessage = error.errors[0].message;
 			const key = error.errors[0].path
-			validationError(res, key, errorMessage);
+			validationError(res, errorMessage, key);
 		} else {
 			catchError(res, error);
 		}

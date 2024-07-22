@@ -1,8 +1,8 @@
-import sequelize from '../../config/dbConfig.js';
+import sequelize from '../config/dbConfig.js';
 import { DataTypes } from 'sequelize';
-import { User } from '../user/user.model.js';
-import { Event } from '../event/event.model.js';
-import { Pass } from '../event/pass.model.js';
+import { User } from './user.model.js';
+import { Event, Pass } from './event.model.js';
+// import { Pass } from '../event/pass.model.js';
 
 // Event Food Schema
 const Ticket = sequelize.define('ticket', {
@@ -34,7 +34,8 @@ const Ticket = sequelize.define('ticket', {
         type: DataTypes.FLOAT
     },
     paid: {
-        type: DataTypes.BOOLEAN
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 });
 

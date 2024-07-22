@@ -1,6 +1,6 @@
-import { User } from "../../models/user/user.model.js";
-import { frontError, catchError, successOk, validationError } from "../../utils/responses.js";
-import { convertToLowercase, validateEmail, validatePhone } from '../../utils/utils.js';
+import { User } from "../models/user.model.js";
+import { frontError, catchError, successOk, validationError } from "../utils/responses.js";
+import { convertToLowercase, validateEmail, validatePhone } from '../utils/utils.js';
 
 // ========================= updateProfile ===========================
 

@@ -1,14 +1,12 @@
 // Import required modules and configuration
-import express from "express";
-import { updateProfile, deleteProfile } from "../../controllers/profile/profile.controller.js";
-import verifyToken from "../../middlewares/authMiddleware.js";
-import multer from 'multer';
 import path from 'path';
-import { diskStorage } from 'multer';
-import { mkdirSync } from 'fs';
+import multer from 'multer';
+import express from "express";
 import { resolve } from 'path';
-
-
+import { mkdirSync } from 'fs';
+import { diskStorage } from 'multer';
+import verifyToken from "../middlewares/authMiddleware.js";
+import { updateProfile, deleteProfile } from "../controllers/profile.controller.js";
 
 // Function to create directory if it doesn't exist
 const createDirectoryIfNotExists = (directory) => {
@@ -37,7 +35,6 @@ const storage = diskStorage({
 });
 
 const upload = multer({ storage });
-
 
 const router = express.Router();
 
