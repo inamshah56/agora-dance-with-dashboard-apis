@@ -13,8 +13,6 @@ export default function verifyToken(req, res, next) {
     }
     token = token.replace("Bearer ", "")
 
-    // console.log("Token :", token);
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded.userUid; // userUid is uuid
     next();

@@ -1,4 +1,4 @@
-import sequelize from '../../config/dbConfig.js';
+import sequelize from '../config/dbConfig.js';
 import { DataTypes } from 'sequelize';
 import bcrypt from "bcryptjs"
 
@@ -64,7 +64,7 @@ const User = sequelize.define('user', {
     },
     fcm_token: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     }
 },
     {
