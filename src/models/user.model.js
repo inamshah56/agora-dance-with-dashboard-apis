@@ -29,7 +29,6 @@ const User = sequelize.define('user', {
     },
     gender: {
         type: DataTypes.ENUM('male', 'female', 'other'),
-        allowNull: false,
         validate: {
             isIn: {
                 args: [['male', 'female', 'other']],
