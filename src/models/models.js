@@ -1,4 +1,4 @@
-import "./user/user.model.js";
-import "./event/event.model.js";
-import "./event/eventImages.model.js";
-import "./event/favourites.model.js";
+import "./user.model.js";
+import "./event.model.js";
+import "./ticket.model.js";
+import "./advertisement.model.js";

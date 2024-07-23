@@ -10,10 +10,11 @@ import cookieParser from "cookie-parser";
 import { nodeEnv, port } from "./config/initialConfig.js";
 import { connectDB } from "./config/dbConfig.js";
 import "./models/models.js";
-import authRoutes from "./routes/auth/auth.route.js"; // Make sure you have this import for auth routes
-import eventRoutes from "./routes/event/event.route.js";
-import profileRoute from "./routes/profile/profile.route.js";
-import testRoute from "./routes/routes.js";
+import authRoutes from "./routes/auth.route.js"; // Make sure you have this import for auth routes
+import eventRoutes from "./routes/event.route.js";
+import ticketRoutes from "./routes/ticket.route.js";
+import profileRoutes from "./routes/profile.route.js";
+import advertisementRoutes from "./routes/advertisement.route.js";
 import os from "os"
 
 // Initializing the app
@@ -49,13 +50,12 @@ app.get('/', (req, res) => {
   res.send("Welcome to Agora Dance");
 });
 
-// Use authentication routes
+// routes
 app.use("/api/auth", authRoutes);
-
-// other routes
-app.use("/api/test", testRoute)
-app.use("/api/profile", profileRoute)
+app.use("/api/profile", profileRoutes)
 app.use("/api/event", eventRoutes)
+app.use("/api/ticket", ticketRoutes)
+app.use("/api/advertisement", advertisementRoutes)
 
 // Global error handler
 app.use((err, req, res, next) => {
