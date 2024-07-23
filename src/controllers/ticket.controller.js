@@ -5,7 +5,7 @@ import { Event, Pass, Room, Food } from "../models/event.model.js";
 import { frontError, catchError, validationError, successOk, successOkWithData } from "../utils/responses.js";
 
 // =====================================================================
-// =============================== Tickets =============================
+//                                Tickets
 // =====================================================================
 
 // ============================ getAllTickets ==========================
@@ -47,6 +47,7 @@ export async function getAllTickets(req, res) {
 
 
 // ========================== bookConcertTicket ========================
+
 export async function bookConcertTicket(req, res) {
     try {
         const reqBodyFields = bodyReqFields(req, res, [
@@ -80,7 +81,17 @@ export async function bookConcertTicket(req, res) {
             return frontError(res, 'Invalid eventUuid', 'eventUuid');
         }
 
-        if (event.type !== 'concert') return frontError(res, "Only Concert Tickets can be Booked here")
+        if (event.type !== 'concert' && event.type !== 'congress') return frontError(res, "Only Concert and Congress Tickets (other than full pass) can be Booked here")
+
+        // check tickets availability 
+        const ticketCount = await Ticket.count({
+            where: {
+                event_uuid: eventUuid
+            }
+        });
+        const availableTickets = event.total_tickets - ticketCount
+        console.log(availableTickets);
+        if (availableTickets === 0) return successOk(res, "Booking Closed. No Tickets Available")
 
         const pass = await Pass.findOne({
             where: {
@@ -93,6 +104,9 @@ export async function bookConcertTicket(req, res) {
         if (!pass) {
             return frontError(res, 'Invalid passUuid', 'passUuid');
         }
+
+        if (event.type === 'congress' && pass.pass_type === 'full pass') return frontError(res, "Full Pass for Congress cannot be Booked here. (Use ticket/congress api)", "passUuid")
+
 
         // CALCULATING TICKET AMOUNT 
         let totalAmountCalculated = pass.price * noOfPersons
@@ -189,6 +203,15 @@ export async function bookCongressTicket(req, res) {
 
         if (event.type !== 'congress') return frontError(res, "Only Congress Tickets can be Booked here")
 
+        // check tickets availability 
+        const ticketCount = await Ticket.count({
+            where: {
+                event_uuid: eventUuid
+            }
+        });
+        const availableTickets = event.total_tickets - ticketCount
+        if (availableTickets === 0) return successOk(res, "Booking Closed. No Tickets Available")
+
         if (foodType !== 'breakfast' && foodType !== 'fullboard') {
             return frontError(res, 'foodType must be either breakfast or fullboard', 'foodType');
         }
@@ -204,6 +227,8 @@ export async function bookCongressTicket(req, res) {
         if (!pass) {
             return frontError(res, 'Invalid passUuid', 'passUuid');
         }
+
+        if (pass.pass_type !== 'full pass') return frontError(res, "Only Full Pass for Congress can be Booked here")
 
         if (noOfRooms !== roomUuidsArray.length) return frontError(res, "noOfRooms doesn't match the info in roomUuidArray")
 

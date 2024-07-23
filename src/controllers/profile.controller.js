@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.js";
+import { Sequelize } from 'sequelize';
 import { frontError, catchError, successOk, validationError } from "../utils/responses.js";
 import { convertToLowercase, validateEmail, validatePhone } from '../utils/utils.js';
 
@@ -9,7 +10,7 @@ export async function updateProfile(req, res) {
         const userUid = req.user
         const user = await User.findOne({ where: { uuid: userUid } });
         if (!user) {
-            return frontError(res, 'invalid uuid', 'uuid');
+            return frontError(res, 'Invalid uuid, No User Found', 'uuid');
         }
 
         // If a profile image was uploaded, update profile_url in user table
@@ -57,6 +58,15 @@ export async function updateProfile(req, res) {
         return successOk(res, "User Profile Updated Successfully")
     } catch (error) {
         console.log(error)
+        if (error instanceof Sequelize.UniqueConstraintError) {
+            console.log("SequelizeUniqueConstraintError")
+            console.log("SequelizeUniqueConstraintError")
+            console.log("SequelizeUniqueConstraintError")
+            const uniqueConstraintError = error.errors.find(err => err.validatorKey === 'not_unique');
+            if (uniqueConstraintError) {
+                return validationError(res, `${uniqueConstraintError.message}.`, "email");
+            }
+        }
         catchError(res, error);
     }
 }
@@ -68,7 +78,7 @@ export async function deleteProfile(req, res) {
         const userUid = req.user
         const user = await User.findOne({ where: { uuid: userUid } });
         if (!user) {
-            return frontError(res, 'invalid uuid', 'uuid');
+            return frontError(res, 'Invalid uuid, No User Found', 'uuid');
         }
         await user.destroy()
         return successOk(res, "User Profile Deleted Successfully")

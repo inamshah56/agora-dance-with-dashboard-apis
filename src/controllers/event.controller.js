@@ -1,11 +1,9 @@
 import { Sequelize, Op } from "sequelize";
+import { Ticket } from "../models/ticket.model.js";
 import { bodyReqFields } from "../utils/requiredFields.js"
 import { convertToLowercase, validateEmail, validatePassword } from '../utils/utils.js';
 import { Event, EventImages, FavouriteEvents, Pass, Room, Food } from "../models/event.model.js";
 import { created, frontError, catchError, validationError, createdWithData, successOk, successOkWithData, notFound } from "../utils/responses.js";
-
-
-
 
 // =============================================================
 //                           Helping function
@@ -25,9 +23,10 @@ function isDateSmallerThanToday(dateToCheck) {
     return date < today;
 }
 
-// =============================================================
+// ==============================================================
 //                           Controllers
-// =============================================================
+// ==============================================================
+
 // ========================= getEvent ===========================
 
 export async function getEvent(req, res) {
@@ -39,6 +38,18 @@ export async function getEvent(req, res) {
         if (!event) {
             return frontError(res, 'invalid uuid', 'uuid');
         }
+
+        console.log("event.date  ======== : ", event.date)
+        console.log("event.date type ======== : ", typeof event.date)
+
+        const ticketCount = await Ticket.count({
+            where: {
+                event_uuid: uuid
+            }
+        });
+
+        const availableTickets = event.total_tickets - ticketCount
+        event.dataValues.availableTickets = availableTickets
 
         return successOkWithData(res, "Event Fetched Successfully", event.dataValues)
     } catch (error) {
@@ -297,6 +308,9 @@ export async function getFilteredEvents(req, res) {
 
         const event = await Event.findAll({
             where: filters,
+            attributes: {
+                exclude: ['total_tickets', 'city', 'province', 'organizer', 'organizer_details', 'createdAt', 'updatedAt']
+            },
             include: [{
                 model: EventImages,
                 as: 'event_images', // Assuming you have defined an association alias 'images'
@@ -382,7 +396,7 @@ export async function getEventBookingDetails(req, res) {
 }
 
 // =====================================================================
-// ========================= Favourite Events ==========================
+//                               Favourite Events
 // =====================================================================
 
 // =========================== getAllFavourites ========================
@@ -501,7 +515,7 @@ export async function removeFromFavourites(req, res) {
 }
 
 // =====================================================================
-// ================================ Passes =============================
+//                                  Passes 
 // =====================================================================
 
 // ============================= addConcertPass ========================
@@ -532,7 +546,9 @@ export async function addConcertPass(req, res) {
             return validationError(res, 'No Event Exist', 'eventUuid');
         }
 
-        if (event.type !== 'concert') return validationError(res, "Only Concert Pass can be added here")
+        if (event.type !== 'concert') return validationError(res, "Only Concert Pass can be added here", "eventUuid")
+
+        if (passType !== 'full pass') return validationError(res, "Concert can have Full Pass Only", "passType")
 
         const pass = await Pass.findOne({
             where: {
@@ -542,6 +558,8 @@ export async function addConcertPass(req, res) {
         if (pass) {
             return validationError(res, 'Pass Already Exist');
         }
+
+        if (isDateSmallerThanToday(date)) return frontError(res, "Pass for Event cannot be added in past", "date");
 
         const time = req.body.time || event.time
 
@@ -624,7 +642,7 @@ export async function addCongressPass(req, res) {
 }
 
 // =====================================================================
-// ================================ Rooms ==============================
+//                                  Rooms
 // =====================================================================
 
 // ========================= addCongressRooms ===========================

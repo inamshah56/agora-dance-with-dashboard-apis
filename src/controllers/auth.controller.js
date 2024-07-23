@@ -124,7 +124,7 @@ export async function loginUser(req, res) {
 		// Check if a user with the given email exists
 		const user = await User.findOne({ where: { email: email } });
 		if (!user) {
-			return validationError(res, "user not found")
+			return validationError(res, "user not found", "email")
 		}
 
 		// Compare passwords
@@ -179,7 +179,7 @@ export async function updatePassword(req, res) {
 		// Check if a user with the given email exists
 		const user = await User.findOne({ where: { email: email } });
 		if (!user) {
-			return validationError(res, "user not found")
+			return validationError(res, "user not found", "email")
 		}
 
 		// Compare oldPassword with hashed password in database
@@ -223,7 +223,7 @@ export async function forgotPassword(req, res) {
 		// Check if a user with the given email exists
 		const user = await User.findOne({ where: { email: email } });
 		if (!user) {
-			return validationError(res, "user not found")
+			return validationError(res, "user not found", "email")
 		}
 
 		// generating otp 
@@ -264,7 +264,7 @@ export async function verifyOtp(req, res) {
 		// Check if a user with the given email exists
 		const user = await User.findOne({ where: { email: email } });
 		if (!user) {
-			return validationError(res, "user not found")
+			return validationError(res, "user not found", "email")
 		}
 
 		if (user.otp_count >= 3) {
@@ -307,7 +307,7 @@ export async function setNewPassword(req, res) {
 		// Check if a user with the given email exists
 		const user = await User.findOne({ where: { email: email } });
 		if (!user) {
-			return validationError(res, "user not found")
+			return validationError(res, "user not found", "email")
 		}
 
 		// Check if passwords match
