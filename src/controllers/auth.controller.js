@@ -13,7 +13,9 @@ import {
 	validationError,
 	successOk,
 	successOkWithData,
-	UnauthorizedError
+	UnauthorizedError,
+	conflictError,
+	notFound
 } from "../utils/responses.js";
 
 // ========================= nodemailer configuration ===========================
@@ -73,7 +75,7 @@ export async function registerUser(req, res) {
 			}
 		});
 
-		if (user) return validationError(res, "", "User already exists");
+		if (user) return conflictError(res, "User already exists");
 
 		const invalidEmail = validateEmail(email)
 		if (invalidEmail) return validationError(res, invalidEmail)
@@ -124,7 +126,7 @@ export async function loginUser(req, res) {
 		// Check if a user with the given email exists
 		const user = await User.findOne({ where: { email: email } });
 		if (!user) {
-			return validationError(res, "user not found", "email")
+			return notFound(res, "user not found", "email")
 		}
 
 		// Compare passwords
@@ -168,18 +170,19 @@ export async function regenerateAccessToken(req, res) {
 
 // ========================= updatePassword ===========================
 
-// API endpoint to set new password after OTP verification
 export async function updatePassword(req, res) {
 	try {
-		const reqBodyFields = bodyReqFields(req, res, ["oldPassword", "newPassword", "confirmPassword", "email"]);
+		const userUid = req.user
+		console.log("userUid =========== : ", userUid);
+		const reqBodyFields = bodyReqFields(req, res, ["oldPassword", "newPassword", "confirmPassword"]);
 		if (reqBodyFields.error) return reqBodyFields.resData;
 
-		const { oldPassword, newPassword, confirmPassword, email } = req.body;
+		const { oldPassword, newPassword, confirmPassword } = req.body;
 
 		// Check if a user with the given email exists
-		const user = await User.findOne({ where: { email: email } });
+		const user = await User.findOne({ where: { uuid: userUid } });
 		if (!user) {
-			return validationError(res, "user not found", "email")
+			return notFound(res, "user not found")
 		}
 
 		// Compare oldPassword with hashed password in database
@@ -204,7 +207,7 @@ export async function updatePassword(req, res) {
 
 		// // Update user's password in the database
 		await User.update({ password: hashedPassword }, {
-			where: { email }
+			where: { uuid: userUid }
 		});
 
 		return successOk(res, "Password updated successfully.");
@@ -223,7 +226,7 @@ export async function forgotPassword(req, res) {
 		// Check if a user with the given email exists
 		const user = await User.findOne({ where: { email: email } });
 		if (!user) {
-			return validationError(res, "user not found", "email")
+			return notFound(res, "user not found", "email")
 		}
 
 		// generating otp 
@@ -264,7 +267,7 @@ export async function verifyOtp(req, res) {
 		// Check if a user with the given email exists
 		const user = await User.findOne({ where: { email: email } });
 		if (!user) {
-			return validationError(res, "user not found", "email")
+			return notFound(res, "user not found", "email")
 		}
 
 		if (user.otp_count >= 3) {
@@ -307,7 +310,7 @@ export async function setNewPassword(req, res) {
 		// Check if a user with the given email exists
 		const user = await User.findOne({ where: { email: email } });
 		if (!user) {
-			return validationError(res, "user not found", "email")
+			return notFound(res, "user not found", "email")
 		}
 
 		// Check if passwords match

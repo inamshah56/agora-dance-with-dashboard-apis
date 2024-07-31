@@ -103,9 +103,10 @@ const forbiddenError = (res, message) => {
 
 // ============================ notFound ==========================
 
-const notFound = (res, message) => {
+const notFound = (res, message, field) => {
     return res.status(404).send({
         success: false,
+        field: field,
         message: message,
     });
 };
