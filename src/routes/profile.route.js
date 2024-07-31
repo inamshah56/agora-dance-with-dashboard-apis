@@ -6,7 +6,7 @@ import { resolve } from 'path';
 import { mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import verifyToken from "../middlewares/authMiddleware.js";
-import { updateProfile, deleteProfile } from "../controllers/profile.controller.js";
+import { getProfile, updateProfile, deleteProfile } from "../controllers/profile.controller.js";
 
 // Function to create directory if it doesn't exist
 const createDirectoryIfNotExists = (directory) => {
@@ -37,6 +37,8 @@ const storage = diskStorage({
 const upload = multer({ storage });
 
 const router = express.Router();
+
+router.get("/get", verifyToken, getProfile);
 
 router.patch("/update", verifyToken, upload.single('profileImage'), updateProfile);
 

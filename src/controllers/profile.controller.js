@@ -1,7 +1,28 @@
 import { User } from "../models/user.model.js";
 import { Sequelize } from 'sequelize';
-import { frontError, catchError, successOk, validationError } from "../utils/responses.js";
+import { frontError, catchError, successOk, validationError, successOkWithData } from "../utils/responses.js";
 import { convertToLowercase, validateEmail, validatePhone } from '../utils/utils.js';
+
+// ========================= getProfile ===========================
+
+export async function getProfile(req, res) {
+    try {
+        const userUid = req.user
+        const user = await User.findOne({
+            where: { uuid: userUid },
+            attributes: {
+                exclude: ['password', 'otp', 'otp_count', 'can_change_password', 'fcm_token', 'createdAt', 'updatedAt']
+            }
+        });
+        if (!user) {
+            return frontError(res, 'Invalid uuid, No User Found', 'uuid');
+        }
+        return successOkWithData(res, "User Profile Fetched Successfully", user)
+    } catch (error) {
+        console.log(error)
+        catchError(res, error);
+    }
+}
 
 // ========================= updateProfile ===========================
 
