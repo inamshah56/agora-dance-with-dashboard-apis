@@ -51,9 +51,6 @@ export async function getEvent(req, res) {
             return frontError(res, 'invalid uuid', 'uuid');
         }
 
-        console.log("event.date  ======== : ", event.date)
-        console.log("event.date type ======== : ", typeof event.date)
-
         const ticketCount = await Ticket.count({
             where: {
                 event_uuid: uuid
@@ -139,8 +136,6 @@ export async function addEvent(req, res) {
         // Process images if available
         if (req.files && req.files["images"]) {
             const imagePaths = req.files["images"].map(file => getRelativePath(file.path));
-
-            console.log(imagePaths);
 
             const imageObjects = imagePaths.map(imagePath => ({
                 event_uuid: eventCreated.uuid,
@@ -369,8 +364,6 @@ export async function getEventBookingDetails(req, res) {
                 }
             })
 
-
-            console.log("passData ====== \n", passData)
             return successOkWithData(res, "Data Fetched", { passData })
         }
         // else

@@ -80,9 +80,6 @@ export async function updateProfile(req, res) {
     } catch (error) {
         console.log(error)
         if (error instanceof Sequelize.UniqueConstraintError) {
-            console.log("SequelizeUniqueConstraintError")
-            console.log("SequelizeUniqueConstraintError")
-            console.log("SequelizeUniqueConstraintError")
             const uniqueConstraintError = error.errors.find(err => err.validatorKey === 'not_unique');
             if (uniqueConstraintError) {
                 return validationError(res, `${uniqueConstraintError.message}.`, "email");
