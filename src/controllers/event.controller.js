@@ -4,6 +4,7 @@ import { bodyReqFields } from "../utils/requiredFields.js"
 import { convertToLowercase, validateEmail, validatePassword } from '../utils/utils.js';
 import { Event, EventImages, FavouriteEvents, Pass, Room, Food } from "../models/event.model.js";
 import { created, frontError, catchError, validationError, createdWithData, successOk, successOkWithData, notFound } from "../utils/responses.js";
+import path from "path"
 
 // =============================================================
 //                           Helping function
@@ -24,6 +25,17 @@ function isDateSmallerThanToday(dateToCheck) {
 }
 
 // ==============================================================
+
+// Helper function to get the relative path from the static base path
+function getRelativePath(fullPath) {
+    const normalizedPath = fullPath.replace(/\\/g, '/');
+    const index = normalizedPath.indexOf('/static');
+    if (index === -1) return '';
+    return normalizedPath.substring(index);
+}
+
+
+// ==============================================================
 //                           Controllers
 // ==============================================================
 
@@ -38,9 +50,6 @@ export async function getEvent(req, res) {
         if (!event) {
             return frontError(res, 'invalid uuid', 'uuid');
         }
-
-        console.log("event.date  ======== : ", event.date)
-        console.log("event.date type ======== : ", typeof event.date)
 
         const ticketCount = await Ticket.count({
             where: {
@@ -126,7 +135,7 @@ export async function addEvent(req, res) {
 
         // Process images if available
         if (req.files && req.files["images"]) {
-            const imagePaths = req.files["images"].map(file => file.path);
+            const imagePaths = req.files["images"].map(file => getRelativePath(file.path));
 
             const imageObjects = imagePaths.map(imagePath => ({
                 event_uuid: eventCreated.uuid,
@@ -318,7 +327,7 @@ export async function getFilteredEvents(req, res) {
             }]
         });
 
-        return successOkWithData(res, "Filtered Events Fetched Successfully", event)
+        return successOkWithData(res, "Filtered Events Fetched Successfully", event);
     } catch (error) {
         console.log(error)
         catchError(res, error);
@@ -355,8 +364,6 @@ export async function getEventBookingDetails(req, res) {
                 }
             })
 
-
-            console.log("passData ====== \n", passData)
             return successOkWithData(res, "Data Fetched", { passData })
         }
         // else

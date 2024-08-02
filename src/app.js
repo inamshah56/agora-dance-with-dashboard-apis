@@ -16,6 +16,8 @@ import ticketRoutes from "./routes/ticket.route.js";
 import profileRoutes from "./routes/profile.route.js";
 import advertisementRoutes from "./routes/advertisement.route.js";
 import os from "os"
+import path from "path"
+import { fileURLToPath } from 'url';
 
 // Initializing the app
 const app = express();
@@ -44,6 +46,12 @@ app.use(limiter);
 
 // Built-in middleware for parsing JSON
 app.use(express.json());
+
+// static directories
+// Convert import.meta.url to a file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/static', express.static(path.join(__dirname, '..', 'static')));
 
 // Route for root path
 app.get('/', (req, res) => {

@@ -30,11 +30,6 @@ const validateSpotifyUrl = (url) => {
 
 export async function getAdvertisement(req, res) {
     try {
-        console.log(" ===== getAdvertisement ===== ")
-        console.log(" ===== getAdvertisement ===== ")
-        console.log(" ===== getAdvertisement ===== ")
-
-
         const reqData = convertToLowercase(req.query)
 
         const { title, category } = reqData
@@ -68,10 +63,6 @@ export async function getAdvertisement(req, res) {
 
 export async function createAdvertisement(req, res) {
     try {
-        console.log(" ===== createAd ===== ")
-        console.log(" ===== createAd ===== ")
-        console.log(" ===== createAd ===== ")
-
         const reqBodyFields = bodyReqFields(req, res, [
             "title",
             "description",
@@ -125,11 +116,7 @@ export async function createAdvertisement(req, res) {
             paid: paid || false
         }
 
-        console.log("advertisementData ============ \n", advertisementData)
-
-        const advertisementCreated = await Advertisement.create(advertisementData)
-
-        console.log("advertisementCreated ============ \n", advertisementCreated)
+        await Advertisement.create(advertisementData)
 
         return successOk(res, "Advertisement created Successfully")
     } catch (error) {
