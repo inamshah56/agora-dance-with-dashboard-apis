@@ -4,6 +4,7 @@ import { bodyReqFields } from "../utils/requiredFields.js"
 import { convertToLowercase, validateEmail, validatePassword } from '../utils/utils.js';
 import { Event, EventImages, FavouriteEvents, Pass, Room, Food } from "../models/event.model.js";
 import { created, frontError, catchError, validationError, createdWithData, successOk, successOkWithData, notFound } from "../utils/responses.js";
+import path from "path"
 
 // =============================================================
 //                           Helping function
@@ -22,6 +23,17 @@ function isDateSmallerThanToday(dateToCheck) {
     // Compare the dates
     return date < today;
 }
+
+// ==============================================================
+
+// Helper function to get the relative path from the static base path
+function getRelativePath(fullPath) {
+    const normalizedPath = fullPath.replace(/\\/g, '/');
+    const index = normalizedPath.indexOf('/static');
+    if (index === -1) return '';
+    return normalizedPath.substring(index);
+}
+
 
 // ==============================================================
 //                           Controllers
@@ -126,7 +138,9 @@ export async function addEvent(req, res) {
 
         // Process images if available
         if (req.files && req.files["images"]) {
-            const imagePaths = req.files["images"].map(file => file.path);
+            const imagePaths = req.files["images"].map(file => getRelativePath(file.path));
+
+            console.log(imagePaths);
 
             const imageObjects = imagePaths.map(imagePath => ({
                 event_uuid: eventCreated.uuid,
@@ -318,7 +332,7 @@ export async function getFilteredEvents(req, res) {
             }]
         });
 
-        return successOkWithData(res, "Filtered Events Fetched Successfully", event)
+        return successOkWithData(res, "Filtered Events Fetched Successfully", event);
     } catch (error) {
         console.log(error)
         catchError(res, error);
