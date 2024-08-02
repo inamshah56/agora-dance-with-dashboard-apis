@@ -63,7 +63,7 @@ export async function registerUser(req, res) {
 		]);
 		const reqData = convertToLowercase(req.body, ['password', 'confirmPassword', 'email'])
 		const {
-			firstName, lastName, dob, gender, phone, email, password, confirmPassword, fcmToken
+			firstName, lastName, dob, gender, phone, email, password, confirmPassword
 		} = reqData;
 
 		if (reqBodyFields.error) return reqBodyFields.resData;
@@ -119,9 +119,10 @@ export async function registerUser(req, res) {
 // Handles user login
 export async function loginUser(req, res) {
 	try {
-		const { email, password } = req.body;
+		const { email, password, fcm } = req.body;
 		if (!email) return frontError(res, "this is required", "email")
 		if (!password) return frontError(res, "this is required", "password")
+		if (!fcm) return frontError(res, "this is required", "fcm")
 
 		// Check if a user with the given email exists
 		const user = await User.findOne({ where: { email: email } });
@@ -138,6 +139,11 @@ export async function loginUser(req, res) {
 		// Generate tokens
 		const accessToken = generateAccessToken(user);
 		const refreshToken = generateRefreshToken(user);
+
+		// save the fcm_token in db against user
+		await User.update({ fcm_token: fcm }, {
+			where: { email }
+		});
 
 		// If passwords match, return success
 		return successOkWithData(res, "Login successful", { accessToken, refreshToken });

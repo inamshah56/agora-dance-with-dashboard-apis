@@ -74,7 +74,6 @@ const User = sequelize.define('user', {
             },
             beforeUpdate: async (user) => {
                 if (user.changed('password')) {
-                    console.log("password update hook called");
                     const salt = await bcrypt.genSalt(12);
                     user.password = await bcrypt.hash(user.password, salt);
                 }
