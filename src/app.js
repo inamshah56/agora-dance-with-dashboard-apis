@@ -18,6 +18,7 @@ import advertisementRoutes from "./routes/advertisement.route.js";
 import os from "os"
 import path from "path"
 import { fileURLToPath } from 'url';
+import sendNotification from "./sendTestNotification.js";
 
 // Initializing the app
 const app = express();
@@ -56,6 +57,16 @@ app.use('/static', express.static(path.join(__dirname, '..', 'static')));
 // Route for root path
 app.get('/', (req, res) => {
   res.send("Welcome to Agora Dance");
+});
+
+// Route to send test notification 
+app.post('/send-test-notification/', async (req, res) => {
+  const fcmToken = req.body.fcmToken;
+  if (!fcmToken) {
+    return res.status(400).json({ message: "FCM token is required, key is 'fcmToken'" });
+  }
+  const response = await sendNotification(fcmToken, "This is title", "Body of the notification");
+  res.status(200).json({ message: "Notification sent successfully", response });
 });
 
 // routes
