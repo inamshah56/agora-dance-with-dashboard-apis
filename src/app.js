@@ -18,7 +18,7 @@ import advertisementRoutes from "./routes/advertisement.route.js";
 import os from "os"
 import path from "path"
 import { fileURLToPath } from 'url';
-import sendNotification from "./sendTestNotification.js";
+import sendTestNotification from "./notifications/sendTestNotification.js";
 
 // Initializing the app
 const app = express();
@@ -65,7 +65,7 @@ app.post('/send-test-notification/', async (req, res) => {
   if (!fcmToken) {
     return res.status(400).json({ message: "FCM token is required, key is 'fcmToken'" });
   }
-  const response = await sendNotification(fcmToken, "This is title", "Body of the notification");
+  const response = await sendTestNotification(fcmToken, "This is title", "Body of the notification");
   res.status(200).json({ message: "Notification sent successfully", response });
 });
 
