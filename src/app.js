@@ -15,6 +15,7 @@ import eventRoutes from "./routes/event.route.js";
 import ticketRoutes from "./routes/ticket.route.js";
 import profileRoutes from "./routes/profile.route.js";
 import advertisementRoutes from "./routes/advertisement.route.js";
+import paymentRoutes from "./routes/payment.routes.js";
 import os from "os"
 import path from "path"
 import { fileURLToPath } from 'url';
@@ -69,12 +70,20 @@ app.post('/send-test-notification/', async (req, res) => {
   res.status(200).json({ message: "Notification sent successfully", response });
 });
 
+app.get('/redsys', (req, res) => {
+  res.sendFile(path.join(__dirname, 'HTML', 'redsys.html'));
+});
+app.get('/redsys/res', (req, res) => {
+  res.sendFile(path.join(__dirname, 'HTML', 'redsysResponse.html'));
+});
+
 // routes
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes)
 app.use("/api/event", eventRoutes)
 app.use("/api/ticket", ticketRoutes)
 app.use("/api/advertisement", advertisementRoutes)
+app.use("/api/payment", paymentRoutes)
 
 // Global error handler
 app.use((err, req, res, next) => {
