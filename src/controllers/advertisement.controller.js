@@ -26,6 +26,16 @@ const validateSpotifyUrl = (url) => {
     return spotifyRegex.test(url);
 };
 
+// ==============================================================
+
+// Helper function to get the relative path from the static base path
+function getRelativePath(fullPath) {
+    const normalizedPath = fullPath.replace(/\\/g, '/');
+    const index = normalizedPath.indexOf('/static');
+    if (index === -1) return '';
+    return normalizedPath.substring(index);
+}
+
 // ========================= getAdvertisement ===========================
 
 export async function getAdvertisement(req, res) {
@@ -103,6 +113,13 @@ export async function createAdvertisement(req, res) {
         //     return validationError(res, 'Invalid Spotify URL.', "spotifyUrl")
         // }
 
+        const imagePath = getRelativePath(req.file.path);
+
+        console.log("imagePath")
+        console.log("imagePath")
+        console.log("imagePath")
+        console.log("imagePath", imagePath)
+
         const advertisementImagePath = req.file.path;
 
         const advertisementData = {
@@ -112,7 +129,7 @@ export async function createAdvertisement(req, res) {
             youtube_url: youtubeUrl,
             instagram_url: instagramUrl,
             spotify_url: spotifyUrl,
-            image: advertisementImagePath,
+            image: imagePath,
             paid: paid || false
         }
 
