@@ -4,7 +4,6 @@ import { bodyReqFields } from "../utils/requiredFields.js"
 import { convertToLowercase, validateEmail, validatePassword } from '../utils/utils.js';
 import { Event, EventImages, FavouriteEvents, Pass, Room, Food } from "../models/event.model.js";
 import { created, frontError, catchError, validationError, createdWithData, successOk, successOkWithData, notFound } from "../utils/responses.js";
-import path from "path"
 
 // =============================================================
 //                           Helping function
@@ -318,7 +317,7 @@ export async function getFilteredEvents(req, res) {
         const event = await Event.findAll({
             where: filters,
             attributes: {
-                exclude: ['total_tickets', 'city', 'province', 'organizer', 'organizer_details', 'createdAt', 'updatedAt']
+                exclude: ['total_tickets', 'organizer', 'organizer_details', 'createdAt', 'updatedAt']
             },
             include: [{
                 model: EventImages,
