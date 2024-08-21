@@ -1,7 +1,8 @@
 import admin from 'firebase-admin';
 
 
-const filePath = process.env.AGORA_ADMIN_SDK;
+const filePath = process.env.AGORA_ADMIN_SDK || "../../agoradance-d8d90-firebase-adminsdk-tm95v-ff08c3aa1e.json";
+console.log("filePath: ", filePath)
 const serviceAccount = await import(filePath, {
     assert: { type: 'json' }
 });
