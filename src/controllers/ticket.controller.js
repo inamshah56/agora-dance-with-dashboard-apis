@@ -110,7 +110,7 @@ export async function bookConcertTicket(req, res) {
         let totalAmountCalculated = pass.price * noOfPersons
 
         if (totalAmountCalculated !== totalAmount) {
-            return frontError(res, "Conflict in Total Amount Calculation", "totalAmount")
+            return frontError(res, `Conflict in Total Amount Calculation. (totalAmount should be ${totalAmountCalculated})`, "totalAmount")
         }
 
         const ticketData = {
@@ -275,7 +275,7 @@ export async function bookCongressTicket(req, res) {
         const totalAmountCalculated = roomAmount + foodAmount + passAmount
 
         if (totalAmountCalculated !== totalAmount) {
-            return frontError(res, "Conflict in Total Amount Calculation", "totalAmount")
+            return frontError(res, `Conflict in Total Amount Calculation. (totalAmount should be ${totalAmountCalculated})`, "totalAmount")
         }
 
         let bedString = ''
