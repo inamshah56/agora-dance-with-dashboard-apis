@@ -237,13 +237,14 @@ export async function bookCongressTicket(req, res) {
                 exclude: ['createdAt', 'updatedAt', 'event_uuid']
             }
         })
+
         if (!room || (Array.isArray(room) && room.length === 0)) {
             return frontError(res, 'Invalid roomUuidsArray. No Room Found for roomUuidArray.', 'roomUuidsArray');
         }
 
         room = JSON.parse(JSON.stringify(room))
 
-        if (room.length !== roomUuidsArray.length) return frontError(res, "Invalid roomUuidsArray. Contain roomUuid that doesn't Exist.")
+        // if (room.length !== roomUuidsArray.length) return frontError(res, "Invalid roomUuidsArray. Contain roomUuid that doesn't Exist.")
 
         const food = await Food.findOne({
             where: {
