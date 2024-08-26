@@ -465,7 +465,16 @@ export async function getAllFavourites(req, res) {
                 {
                     model: Event,
                     as: 'event',
-                    where: filters
+                    where: filters,
+                    include: [
+                        {
+                            model: EventImages,
+                            as: 'event_images',
+                            attributes: ['image_url'],
+                            limit: 1,
+                            order: [['createdAt', 'ASC']],
+                        }
+                    ]
                 }
             ]
         });
