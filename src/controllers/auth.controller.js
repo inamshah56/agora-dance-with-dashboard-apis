@@ -345,3 +345,34 @@ export async function setNewPassword(req, res) {
 }
 
 // ===================================================================
+
+
+// ========================= findUser ===========================
+
+// API endpoint to set new password after OTP verification
+export async function findUser(req, res) {
+	try {
+		// const reqBodyFields = bodyReqFields(req, res, ["newPassword", "confirmPassword", "email"]);
+		// if (reqBodyFields.error) return reqBodyFields.resData;
+
+		const { email } = req.body;
+		if (!email) return frontError(res, "this is required", "email")
+
+		// Check if a user with the given email exists
+		const user = await User.findOne(
+			{
+				where: { email: email },
+				attributes: ['uuid', 'email', 'first_name', 'last_name', 'profile_url']
+			}
+		);
+		if (!user) {
+			return notFound(res, "user not found", "email")
+		}
+
+		return successOkWithData(res, "User Found successfully.", user);
+	} catch (error) {
+		catchError(res, error);
+	}
+}
+
+// ===================================================================
