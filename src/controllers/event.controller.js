@@ -497,6 +497,10 @@ export async function addToFavourites(req, res) {
             return frontError(res, 'this is required', "eventUuid")
         }
 
+        const alreadyInFavouriteEvents = await FavouriteEvents.findOne({ event_uuid: eventUuid })
+
+        if (alreadyInFavouriteEvents) return validationError(res, "Event already added in Favourite Events")
+
         const addedtoFavourites = await FavouriteEvents.create({ event_uuid: eventUuid, user_uuid: userUid })
 
         return successOkWithData(res, "Event Added to Favourites", addedtoFavourites)
