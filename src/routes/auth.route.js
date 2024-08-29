@@ -1,6 +1,6 @@
 // Import required modules and configuration
 import express from "express";
-import { loginUser, registerUser, forgotPassword, verifyOtp, setNewPassword, regenerateAccessToken, updatePassword, findUser } from "../controllers/auth.controller.js";
+import { loginUser, registerUser, forgotPassword, verifyOtp, setNewPassword, regenerateAccessToken, updatePassword, findUsersRealtime, getAllUsers } from "../controllers/auth.controller.js";
 import verifyToken from "../middlewares/authMiddleware.js";
 import passport from "passport";
 import "../strategies/googleStrategy.js";
@@ -29,6 +29,8 @@ router.get("/web/google/redirect", passport.authenticate("google", { session: fa
 
 router.post("/mobile/google-login", googleLogin);
 
-router.post("/find", findUser);
+router.get("/users-realtime", findUsersRealtime);
+
+router.get("/users-all", getAllUsers);
 
 export default router;
