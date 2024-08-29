@@ -82,4 +82,50 @@ const calculateAge = (dob) => {
     return age;
 }
 
-export { convertToLowercase, validateEmail, validatePassword, validatePhone, calculateAge };
+// ============================ getRelativePath =================================
+
+// Helper function to get the relative path from the static base path
+const getRelativePath = (fullPath) => {
+    const normalizedPath = fullPath.replace(/\\/g, '/');
+    const index = normalizedPath.indexOf('/static');
+    if (index === -1) return '';
+    return normalizedPath.substring(index);
+}
+
+// ============================ advertisement helping functions =================================
+
+// Helper function to validate YouTube URLs
+const validateYouTubeUrl = (url) => {
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(channel\/|user\/|playlist\/|watch\?v=|embed\/|v\/)?|youtu\.be\/)([a-zA-Z0-9_-]{11})$/;
+    return youtubeRegex.test(url);
+};
+
+// Helper function to validate Instagram URLs
+const validateInstagramUrl = (url) => {
+    const instagramRegex = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9._]+\/?$/;
+    return instagramRegex.test(url);
+};
+
+// Helper function to validate Spotify URLs
+const validateSpotifyUrl = (url) => {
+    const spotifyRegex = /^(https?:\/\/)?(www\.)?spotify\.com\/(track|album|playlist|artist)\/[a-zA-Z0-9]{22}$/;
+    return spotifyRegex.test(url);
+};
+
+// ============================ isDateSmallerThanToday =================================
+
+function isDateSmallerThanToday(dateToCheck) {
+    // Get today's date
+    const today = new Date();
+
+    // Set the time to 00:00:00 to only compare the dates
+    today.setHours(0, 0, 0, 0);
+
+    // Create a Date object from the dateToCheck (assuming dateToCheck is a string)
+    const date = new Date(dateToCheck);
+
+    // Compare the dates
+    return date < today;
+}
+
+export { convertToLowercase, validateEmail, validatePassword, validatePhone, calculateAge, getRelativePath, validateYouTubeUrl, validateInstagramUrl, validateSpotifyUrl, isDateSmallerThanToday };

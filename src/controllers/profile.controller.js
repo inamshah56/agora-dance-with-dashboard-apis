@@ -1,7 +1,7 @@
 import { User } from "../models/user.model.js";
 import { Sequelize } from 'sequelize';
 import { frontError, catchError, successOk, validationError, successOkWithData } from "../utils/responses.js";
-import { convertToLowercase, validateEmail, validatePhone } from '../utils/utils.js';
+import { convertToLowercase, validateEmail, validatePhone, getRelativePath } from '../utils/utils.js';
 
 // ========================= getProfile ===========================
 
@@ -36,8 +36,8 @@ export async function updateProfile(req, res) {
 
         // If a profile image was uploaded, update profile_url in user table
         if (req.file) {
-            const profileImagePath = req.file.path;
-            user.profile_url = profileImagePath;
+            const imagePath = getRelativePath(req.file.path);
+            user.profile_url = imagePath;
         }
 
         const reqData = convertToLowercase(req.body)

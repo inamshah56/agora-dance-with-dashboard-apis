@@ -1,7 +1,7 @@
 // Import required modules and configuration
 import multer from 'multer';
 import express from "express";
-import storage from '../config/multer.js';
+import storage from '../config/advertisementMulter.js';
 import verifyToken from "../middlewares/authMiddleware.js";
 import { getAdvertisement, createAdvertisement, updateAdvertisement, deleteAdvertisement } from "../controllers/advertisement.controller.js";
 
