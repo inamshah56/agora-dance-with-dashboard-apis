@@ -1,7 +1,7 @@
 import crypto from "crypto"
 import bcrypt from "bcryptjs";
 import nodemailer from 'nodemailer';
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { User } from "../models/user.model.js";
 import { bodyReqFields } from "../utils/requiredFields.js"
 import { convertToLowercase, validateEmail, validatePassword, validatePhone } from '../utils/utils.js';
@@ -345,3 +345,50 @@ export async function setNewPassword(req, res) {
 }
 
 // ===================================================================
+
+
+// ====================== findUsersRealtime ==========================
+
+// API endpoint to set new password after OTP verification
+export async function findUsersRealtime(req, res) {
+	try {
+
+		let { email } = req.query;
+		if (!email) return frontError(res, "this is required", "email")
+		email = email.toLowerCase()
+		// Check if a user with the given email exists
+		const user = await User.findAll(
+			{
+				where: { email: { [Op.like]: `%${email}%` } },
+				attributes: ['uuid', 'email', 'first_name', 'last_name', 'profile_url']
+			}
+		);
+		if (!user) {
+			return notFound(res, "user not found", "email")
+		}
+
+		return successOkWithData(res, "User Found successfully.", user);
+	} catch (error) {
+		catchError(res, error);
+	}
+}
+
+// ===================================================================
+
+
+// ========================= getAllUsers ===========================
+
+// API endpoint to set new password after OTP verification
+export async function getAllUsers(req, res) {
+	try {
+		const user = await User.findAll({
+			attributes: ['uuid', 'email', 'first_name', 'last_name', 'profile_url']
+		});
+		if (!user) {
+			return notFound(res, "user not found", "email")
+		}
+		return successOkWithData(res, "All Users Fetched Successfully.", user);
+	} catch (error) {
+		catchError(res, error);
+	}
+}

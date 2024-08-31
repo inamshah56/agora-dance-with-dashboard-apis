@@ -2,29 +2,7 @@ import { Op } from 'sequelize';
 import { bodyReqFields } from "../utils/requiredFields.js"
 import { Advertisement } from "../models/advertisement.model.js";
 import { frontError, catchError, successOk, validationError, successOkWithData } from "../utils/responses.js";
-import { convertToLowercase, validateEmail, validatePhone } from '../utils/utils.js';
-
-// =============================================================
-//                           Helping function
-// =============================================================
-
-// Helper function to validate YouTube URLs
-const validateYouTubeUrl = (url) => {
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(channel\/|user\/|playlist\/|watch\?v=|embed\/|v\/)?|youtu\.be\/)([a-zA-Z0-9_-]{11})$/;
-    return youtubeRegex.test(url);
-};
-
-// Helper function to validate Instagram URLs
-const validateInstagramUrl = (url) => {
-    const instagramRegex = /^(https?:\/\/)?(www\.)?instagram\.com\/[a-zA-Z0-9._]+\/?$/;
-    return instagramRegex.test(url);
-};
-
-// Helper function to validate Spotify URLs
-const validateSpotifyUrl = (url) => {
-    const spotifyRegex = /^(https?:\/\/)?(www\.)?spotify\.com\/(track|album|playlist|artist)\/[a-zA-Z0-9]{22}$/;
-    return spotifyRegex.test(url);
-};
+import { convertToLowercase, getRelativePath, validateYouTubeUrl, validateInstagramUrl, validateSpotifyUrl } from '../utils/utils.js';
 
 // ========================= getAdvertisement ===========================
 
@@ -103,6 +81,13 @@ export async function createAdvertisement(req, res) {
         //     return validationError(res, 'Invalid Spotify URL.', "spotifyUrl")
         // }
 
+        const imagePath = getRelativePath(req.file.path);
+
+        console.log("imagePath")
+        console.log("imagePath")
+        console.log("imagePath")
+        console.log("imagePath", imagePath)
+
         const advertisementImagePath = req.file.path;
 
         const advertisementData = {
@@ -112,7 +97,7 @@ export async function createAdvertisement(req, res) {
             youtube_url: youtubeUrl,
             instagram_url: instagramUrl,
             spotify_url: spotifyUrl,
-            image: advertisementImagePath,
+            image: imagePath,
             paid: paid || false
         }
 

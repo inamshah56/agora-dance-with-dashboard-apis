@@ -1,6 +1,6 @@
 import fcm from '../config/firebaseConfig.js';
 
-const sendNotification = async (fcmToken, title, body, imgUrl, data) => {
+const sendNotification = async (fcmToken, title, body, imgUrl, data, navScreen) => {
 
     const message = {
         notification: {
@@ -12,7 +12,7 @@ const sendNotification = async (fcmToken, title, body, imgUrl, data) => {
                 icon: 'stock_ticker_update',
                 color: '#7e55c3',
                 // to open new screen on notification click
-                clickAction: 'INVITE_CATEGORY'
+                clickAction: navScreen
             }
         },
         apns: {
@@ -22,7 +22,7 @@ const sendNotification = async (fcmToken, title, body, imgUrl, data) => {
                     color: '#7e55c3',
                     'mutable-content': 1,
                     // to open new screen on notification click
-                    'category': 'INVITE_CATEGORY'
+                    'category': navScreen
                 }
             }
         },

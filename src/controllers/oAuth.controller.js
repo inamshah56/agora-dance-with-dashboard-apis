@@ -3,8 +3,9 @@ import { generateAccessToken, generateRefreshToken, } from "../utils/jwtTokenGen
 import { successOkWithData, frontError, validationError, catchError } from "../utils/responses.js";
 import { OAuth2Client } from "google-auth-library";
 
-
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID_WEB_FRB);
+// const googleClientId = process.env.GOOGLE_CLIENT_ID_WEB_FRB;
+const googleClientId = process.env.GOOGLE_CLIENT_AGORA;
+const googleClient = new OAuth2Client(googleClientId);
 
 
 // ========================= googleCallback ===========================

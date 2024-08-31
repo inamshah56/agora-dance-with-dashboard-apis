@@ -1,39 +1,9 @@
 import { Sequelize, Op } from "sequelize";
 import { Ticket } from "../models/ticket.model.js";
 import { bodyReqFields } from "../utils/requiredFields.js"
-import { convertToLowercase, validateEmail, validatePassword } from '../utils/utils.js';
+import { convertToLowercase, getRelativePath, isDateSmallerThanToday } from '../utils/utils.js';
 import { Event, EventImages, FavouriteEvents, Pass, Room, Food } from "../models/event.model.js";
 import { created, frontError, catchError, validationError, createdWithData, successOk, successOkWithData, notFound } from "../utils/responses.js";
-import path from "path"
-
-// =============================================================
-//                           Helping function
-// =============================================================
-
-function isDateSmallerThanToday(dateToCheck) {
-    // Get today's date
-    const today = new Date();
-
-    // Set the time to 00:00:00 to only compare the dates
-    today.setHours(0, 0, 0, 0);
-
-    // Create a Date object from the dateToCheck (assuming dateToCheck is a string)
-    const date = new Date(dateToCheck);
-
-    // Compare the dates
-    return date < today;
-}
-
-// ==============================================================
-
-// Helper function to get the relative path from the static base path
-function getRelativePath(fullPath) {
-    const normalizedPath = fullPath.replace(/\\/g, '/');
-    const index = normalizedPath.indexOf('/static');
-    if (index === -1) return '';
-    return normalizedPath.substring(index);
-}
-
 
 // ==============================================================
 //                           Controllers
@@ -261,6 +231,7 @@ export async function deleteEvent(req, res) {
 
 export async function getFilteredEvents(req, res) {
     try {
+        const userUuid = req.user
         const { type, style, date, title, location, city, province } = req.query
 
         let filters = {}
@@ -318,15 +289,23 @@ export async function getFilteredEvents(req, res) {
         const event = await Event.findAll({
             where: filters,
             attributes: {
-                exclude: ['total_tickets', 'city', 'province', 'organizer', 'organizer_details', 'createdAt', 'updatedAt']
+                exclude: ['total_tickets', 'organizer', 'organizer_details', 'createdAt', 'updatedAt']
             },
-            include: [{
-                model: EventImages,
-                as: 'event_images', // Assuming you have defined an association alias 'images'
-                attributes: ['image_url'] // Optionally, specify which attributes to include from Image model
-            }]
+            include: [
+                {
+                    model: EventImages,
+                    as: 'event_images', // Assuming you have defined an association alias 'images'
+                    attributes: ['image_url'] // Optionally, specify which attributes to include from Image model
+                },
+                {
+                    model: FavouriteEvents,
+                    as: 'favourite_events',
+                    attributes: ['uuid'], // Only include the uuid of the favourite event
+                    where: { user_uuid: userUuid }, // Filter by the logged-in user's UUID
+                    required: false // Allows inclusion even if there are no favourite events for a user
+                }
+            ]
         });
-
         return successOkWithData(res, "Filtered Events Fetched Successfully", event);
     } catch (error) {
         console.log(error)
@@ -466,7 +445,16 @@ export async function getAllFavourites(req, res) {
                 {
                     model: Event,
                     as: 'event',
-                    where: filters
+                    where: filters,
+                    include: [
+                        {
+                            model: EventImages,
+                            as: 'event_images',
+                            attributes: ['image_url'],
+                            limit: 1,
+                            order: [['createdAt', 'ASC']],
+                        }
+                    ]
                 }
             ]
         });
@@ -488,6 +476,10 @@ export async function addToFavourites(req, res) {
         if (!eventUuid) {
             return frontError(res, 'this is required', "eventUuid")
         }
+
+        const alreadyInFavouriteEvents = await FavouriteEvents.findOne({ event_uuid: eventUuid })
+
+        if (alreadyInFavouriteEvents) return validationError(res, "Event already added in Favourite Events")
 
         const addedtoFavourites = await FavouriteEvents.create({ event_uuid: eventUuid, user_uuid: userUid })
 
