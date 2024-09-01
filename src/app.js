@@ -7,7 +7,7 @@ import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import compression from "compression";
 import cookieParser from "cookie-parser";
-import { nodeEnv, port } from "./config/initialConfig.js";
+import { NODE_ENVIRONMENT, port } from "./config/initialConfig.js";
 import { connectDB } from "./config/dbConfig.js";
 import "./models/models.js";
 import authRoutes from "./routes/auth.route.js"; // Make sure you have this import for auth routes
@@ -20,19 +20,32 @@ import os from "os"
 import path from "path"
 import { fileURLToPath } from 'url';
 import sendTestNotification from "./notifications/sendTestNotification.js";
+import { getIPAddress } from "./utils/utils.js";
 
 // Initializing the app
 const app = express();
 app.use(cookieParser());
 
 // Essential security headers with Helmet
+// Custom CSP configuration
+const cspOptions = {
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'unsafe-inline'", "https://sis-t.redsys.es:25443"],  // Example of allowing scripts from a specific domain
+    styleSrc: ["'self'", "'unsafe-inline'"],  // Allow inline styles, if necessary
+    imgSrc: ["'self'", "data:", "https://sis-t.redsys.es:25443"],  // Allow images from self, data URIs, and a specific domain
+    formAction: ["'self'", "https://sis-t.redsys.es:25443"],  // Allow forms to be submitted to Redsys
+    upgradeInsecureRequests: [],  // Auto-upgrade http to https if needed
+  },
+};
 app.use(helmet());
+app.use(helmet.contentSecurityPolicy(cspOptions));
 
 // Enable CORS with default settings
 app.use(cors());
 
 // Logger middleware for development environment
-if (nodeEnv === "development") {
+if (NODE_ENVIRONMENT === "moin" || NODE_ENVIRONMENT === "inam") {
   app.use(morgan("dev"));
 }
 
@@ -70,12 +83,9 @@ app.post('/send-test-notification/', async (req, res) => {
   res.status(200).json({ message: "Notification sent successfully", response });
 });
 
-app.get('/redsys', (req, res) => {
-  res.sendFile(path.join(__dirname, 'HTML', 'redsys.html'));
-});
-app.get('/redsys/res', (req, res) => {
-  res.sendFile(path.join(__dirname, 'HTML', 'redsysResponse.html'));
-});
+
+
+
 
 // routes
 app.use("/api/auth", authRoutes);
@@ -97,18 +107,6 @@ app.use((err, req, res, next) => {
 // Database connection
 connectDB();
 
-// Function to get the IP address of the server
-function getIPAddress() {
-  const interfaces = os.networkInterfaces();
-  for (const iface of Object.values(interfaces)) {
-    for (const alias of iface) {
-      if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
-        return alias.address;
-      }
-    }
-  }
-  return '0.0.0.0'; // fallback in case IP address cannot be determined
-}
 
 // Server running
 app.listen(port, () => {

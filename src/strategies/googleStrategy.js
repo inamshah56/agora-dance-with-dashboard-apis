@@ -1,9 +1,10 @@
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import passport from 'passport';
+import { googleClientId, googleClientSecret } from '../config/initialConfig.js';
 
 passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_MOIN,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET_MOIN,
+    clientID: googleClientId,
+    clientSecret: googleClientSecret,
     callbackURL: "http://localhost:8000/api/auth/google/redirect"
 },
     function (accessToken, refreshToken, profile, cb) {

@@ -25,7 +25,7 @@ router.post("/new-password", setNewPassword);
 
 router.get("/web/google", passport.authenticate("google", { scope: ["profile", "email", 'https://www.googleapis.com/auth/userinfo.profile'], session: false }));
 
-router.get("/web/google/redirect", passport.authenticate("google", { session: false }), googleCallback);
+router.get("/google/redirect", passport.authenticate("google", { session: false }), googleCallback);
 
 router.post("/mobile/google-login", googleLogin);
 

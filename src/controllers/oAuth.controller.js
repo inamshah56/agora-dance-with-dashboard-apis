@@ -1,11 +1,11 @@
+import { googleClientIdFrb } from "../config/initialConfig.js";
 import { User } from "../models/user.model.js";
 import { generateAccessToken, generateRefreshToken, } from "../utils/jwtTokenGenerator.js";
 import { successOkWithData, frontError, validationError, catchError } from "../utils/responses.js";
 import { OAuth2Client } from "google-auth-library";
 
 // const googleClientId = process.env.GOOGLE_CLIENT_ID_WEB_FRB;
-const googleClientId = process.env.GOOGLE_CLIENT_AGORA;
-const googleClient = new OAuth2Client(googleClientId);
+const googleClient = new OAuth2Client(googleClientIdFrb);
 
 
 // ========================= googleCallback ===========================

@@ -17,6 +17,7 @@ import {
 	conflictError,
 	notFound
 } from "../utils/responses.js";
+import { emailPass } from "../config/initialConfig.js";
 
 // ========================= nodemailer configuration ===========================
 
@@ -25,7 +26,7 @@ const transporter = nodemailer.createTransport({
 	service: 'gmail',
 	auth: {
 		user: 'agoradance.app@gmail.com',
-		pass: process.env.EMAIL_PASS
+		pass: emailPass
 	}
 });
 
