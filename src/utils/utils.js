@@ -143,4 +143,13 @@ function getIPAddress() {
     return '0.0.0.0'; // fallback in case IP address cannot be determined
 }
 
-export { convertToLowercase, validateEmail, validatePassword, validatePhone, calculateAge, getRelativePath, validateYouTubeUrl, validateInstagramUrl, validateSpotifyUrl, isDateSmallerThanToday, getIPAddress };
+// ============================ createJsDate =================================
+
+function createJsDate(Ds_Date, Ds_Hour) {
+    const [day, month, year] = Ds_Date.split('/');
+    const jsDateString = `${year}-${month}-${day}T${Ds_Hour}:00`;
+    return new Date(jsDateString);
+}
+
+
+export { convertToLowercase, validateEmail, validatePassword, validatePhone, calculateAge, getRelativePath, validateYouTubeUrl, validateInstagramUrl, validateSpotifyUrl, isDateSmallerThanToday, getIPAddress, createJsDate };

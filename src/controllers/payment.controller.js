@@ -3,6 +3,7 @@ import { createRedsysAPI, randomTransactionId, isResponseCodeOk, SANDBOX_URLS, P
 import { Ticket } from "../models/ticket.model.js";
 import { getRedsysConfig } from "../config/redsysPayment.config.js";
 const { urls, secretKey, DS_MERCHANT_MERCHANTCODE, DS_MERCHANT_TERMINAL, DS_MERCHANT_URLOK, DS_MERCHANT_URLKO, DS_MERCHANT_MERCHANTURL, DS_MERCHANT_MERCHANTNAME } = getRedsysConfig();
+import { createJsDate } from "../utils/utils.js";
 
 const { createRedirectForm, processRestNotification, } = createRedsysAPI({
     urls: urls,
@@ -91,7 +92,7 @@ const redsysPaymentSuccess = async (req, res) => {
             }
             const ticket = await Ticket.findOne({
                 where: { order_id: Ds_Order },
-                attributes: ["uid", "paid", "order_id"]
+                attributes: ["uuid", "paid", "order_id"]
             });
             if (ticket && !ticket.paid) {
                 ticket.paid = true;
@@ -127,14 +128,14 @@ const redsysPaymentError = async (req, res) => {
         else {
             const ticket = await Ticket.findOne({
                 where: { order_id: Ds_Order },
-                attributes: ["uid", "paid", "order_id"]
+                attributes: ["uuid", "paid", "order_id"]
             })
             // IF PAYMENT ALREADY DONE ON THIS ORDER_ID
             if (Ds_Response === '9051') {
                 ticket.order_id = null;
                 ticket.paid_order_id = Ds_Order;
                 ticket.paid = true;
-                ticket.payment_date = new Date(`${Ds_Date}T${Ds_Hour}`);
+                ticket.payment_date = createJsDate(Ds_Date, Ds_Hour);
                 ticket.save();
             }
             // IF PAYMENT FAILED
@@ -161,7 +162,7 @@ const redsysPaymentNotification = async (req, res) => {
         if (isResponseCodeOk(Ds_Response)) {
             const ticket = await Ticket.findOne({
                 where: { order_id: Ds_Order },
-                attributes: ["uid", "paid", "order_id"]
+                attributes: ["uuid", "paid", "order_id"]
             });
             if (ticket && !ticket.paid) {
                 ticket.paid = true;
