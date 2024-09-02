@@ -16,7 +16,7 @@ export async function getAllTickets(req, res) {
                 user_uuid: req.user
             },
             attributes: {
-                exclude: ['date', 'no_of_rooms', 'beds', 'food', 'paid', 'createdAt', 'updatedAt', 'event_uuid', 'user_uuid', 'pass_uuid']
+                exclude: ['date', 'no_of_rooms', 'beds', 'food', 'createdAt', 'updatedAt', 'event_uuid', 'user_uuid', 'pass_uuid']
             },
             include: [
                 {
@@ -135,7 +135,7 @@ export async function bookConcertTicket(req, res) {
 
         await Person.bulkCreate(personsWithTicketUuid)
 
-        return successOk(res, "Ticket Booked Successfully")
+        return successOkWithData(res, "Ticket Booked Successfully", { ticketUuid: ticketUuid })
     } catch (error) {
         console.log(error)
         if (error.name === 'SequelizeDatabaseError') {
@@ -312,7 +312,7 @@ export async function bookCongressTicket(req, res) {
 
         await Person.bulkCreate(personsWithTicketUuid)
 
-        return successOk(res, "Ticket Booked Successfully")
+        return successOkWithData(res, "Ticket Booked Successfully", { ticketUuid: ticketUuid })
     } catch (error) {
         console.log(error)
         if (error.name === 'SequelizeDatabaseError') {
