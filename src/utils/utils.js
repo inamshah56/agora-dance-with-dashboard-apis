@@ -1,4 +1,4 @@
-
+import os from 'os';
 // =========================== convertToLowercase ===============================
 
 const convertToLowercase = (obj, excludeFields = []) => {
@@ -128,4 +128,19 @@ function isDateSmallerThanToday(dateToCheck) {
     return date < today;
 }
 
-export { convertToLowercase, validateEmail, validatePassword, validatePhone, calculateAge, getRelativePath, validateYouTubeUrl, validateInstagramUrl, validateSpotifyUrl, isDateSmallerThanToday };
+// ============================ getIPAddress =================================
+
+function getIPAddress() {
+    const interfaces = os.networkInterfaces();
+    for (const iface of Object.values(interfaces)) {
+        for (const alias of iface) {
+            if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
+                return alias.address;
+            }
+        }
+    }
+    console.log('No valid IP address found, falling back to')
+    return '0.0.0.0'; // fallback in case IP address cannot be determined
+}
+
+export { convertToLowercase, validateEmail, validatePassword, validatePhone, calculateAge, getRelativePath, validateYouTubeUrl, validateInstagramUrl, validateSpotifyUrl, isDateSmallerThanToday, getIPAddress };
