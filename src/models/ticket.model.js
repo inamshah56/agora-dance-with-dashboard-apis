@@ -36,7 +36,19 @@ const Ticket = sequelize.define('ticket', {
     paid: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
-    }
+    },
+    order_id: {
+        type: DataTypes.STRING
+    },
+    paid_order_id: {
+        type: DataTypes.STRING
+    },
+    payment_date: {
+        type: DataTypes.DATE
+    },
+    authorization_code: {
+        type: DataTypes.STRING
+    },
 });
 
 const Person = sequelize.define('person', {

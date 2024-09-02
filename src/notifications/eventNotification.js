@@ -37,14 +37,13 @@ const eventInTwoDaysNotification_ForTicektHolder = async () => {
     for (const event of events) {
         const title = "Event reminder";
         const message = `${event.title} is in two days, on ${event.date} at ${event.time}. Don't forget to attend the event.`;
-        const navScreen = "Event_Detail";
-        const data = { "event_uuid": event.uuid }
+        const data = { "event_uuid": event.uuid, navScreen: "Event_Detail" }
 
         const eventTickets = event.event_ticket;
         for (const ticket of eventTickets) {
             // send notifications with evetn title date and image
             try {
-                const response = await sendNotification(ticket.user.fcm_token, title, message, null, data, navScreen)
+                const response = await sendNotification(ticket.user.fcm_token, title, message, null, data)
                 console.log("response: ============================================ ", response)
             }
             catch (err) {
@@ -93,14 +92,13 @@ const eventInTwoDaysNotification_ForFavouriteEvents = async () => {
     for (const event of events) {
         const title = "Don’t miss out: book your ticket now";
         const message = `${event.title} is in two days, on ${event.date} at ${event.time}. Book the ticket to secure your seats.`;
-        const navScreen = "Event_Detail";
-        const data = { "event_uuid": event.uuid }
+        const data = { "event_uuid": event.uuid, navScreen: "Event_Detail" }
 
         const favouriteEvents = event.favourite_events;
         for (const favEvent of favouriteEvents) {
             // send notifications with evetn title date and image
             try {
-                const response = await sendNotification(favEvent.user.fcm_token, title, message, null, data, navScreen)
+                const response = await sendNotification(favEvent.user.fcm_token, title, message, null, data)
                 console.log("response: ============================================ ", response)
             }
             catch (err) {
@@ -110,7 +108,9 @@ const eventInTwoDaysNotification_ForFavouriteEvents = async () => {
     }
 }
 
-eventInTwoDaysNotification_ForFavouriteEvents();
+// eventInTwoDaysNotification_ForFavouriteEvents();
+
+export { eventInTwoDaysNotification_ForTicektHolder, eventInTwoDaysNotification_ForFavouriteEvents };
 
 // Add the notificatin method when the event is added in the certain city for the users;
 // Send notification when the event is added ask from tayyab

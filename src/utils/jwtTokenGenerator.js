@@ -1,22 +1,27 @@
 import jwt from "jsonwebtoken";
+import { jwtSecret } from "../config/initialConfig.js";
 
 // Function to generate access token
 const generateAccessToken = (user) => {
-    return jwt.sign({ userUid: user.uuid }, process.env.JWT_SECRET, {
+    console.log(jwtSecret);
+
+    return jwt.sign({ userUid: user.uuid }, jwtSecret, {
         expiresIn: "30d",
     });
 };
 
 // Function to generate refresh token
 const generateRefreshToken = (user) => {
-    return jwt.sign({ userUid: user.uuid }, process.env.JWT_SECRET, {
+    return jwt.sign({ userUid: user.uuid }, jwtSecret, {
         expiresIn: "120d",
     });
 };
 
 const verifyRefreshToken = (refreshToken) => {
+    console.log(jwtSecret);
     try {
-        return jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+        return jwt.verify(refreshToken, jwtSecret);
     } catch (error) {
         throw new Error('Invalid refresh token');
     }

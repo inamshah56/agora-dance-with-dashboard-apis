@@ -6,7 +6,8 @@
 	"license": "MIT",
 	"scripts": {
 		"start": "node ./src/app.js",
-		"dev": "nodemon ./src/app.js"
+		"dev": "nodemon ./src/app.js",
+		"cron": "node ./src/notifications/dailyNotiCronJob.js"
 	},
 	"dependencies": {
 		"axios": "^1.7.4",
@@ -29,12 +30,14 @@
 		"jsonwebtoken": "^9.0.2",
 		"morgan": "^1.10.0",
 		"multer": "^1.4.5-lts.1",
+		"node-cron": "^3.0.3",
 		"nodemailer": "^6.9.10",
 		"nodemon": "^3.1.0",
 		"passport": "^0.7.0",
 		"passport-google-oauth20": "^2.0.0",
 		"pg": "^8.11.3",
 		"pg-hstore": "^2.3.4",
+		"redsys-easy": "^5.2.5",
 		"sequelize": "^6.37.1",
 		"uuidv4": "^6.2.13",
 		"yonode": "^1.0.0"
