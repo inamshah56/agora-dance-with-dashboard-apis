@@ -34,9 +34,9 @@ const getRedsysConfig = () => {
             DS_MERCHANT_MERCHANTCODE: process.env.DS_MERCHANT_MERCHANTCODE,
             DS_MERCHANT_TERMINAL: '001',
             DS_MERCHANT_MERCHANTNAME: 'Agroa Dance',
-            DS_MERCHANT_URLOK: `https://agronomics.pk/agora/api/payment/redsys/success`,
-            DS_MERCHANT_URLKO: `https://agronomics.pk/agora/api/payment/redsys/error`,
-            DS_MERCHANT_MERCHANTURL: `https://agronomics.pk/agora/api/payment/redsys/notification`,
+            DS_MERCHANT_URLOK: `${domain}/api/payment/redsys/success`,
+            DS_MERCHANT_URLKO: `${domain}/api/payment/redsys/error`,
+            DS_MERCHANT_MERCHANTURL: `${domain}/api/payment/redsys/notification`,
         }
         return config
     }

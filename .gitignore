@@ -53,3 +53,5 @@ static/
 
 oauth-notify-firebase-adminsdk-1z1l7-ef62a9518a.json
 agoradance-d8d90-firebase-adminsdk-tm95v-ff08c3aa1e.json
+ecosystem.config.cjs
+.env
