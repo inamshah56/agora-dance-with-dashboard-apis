@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+import { getIPAddress } from "../utils/utils.js";
 // ==========================================================
 //                     Current Enviroment
 // ==========================================================
@@ -26,7 +27,7 @@ const jwtSecret = process.env.JWT_SECRET_KEY;
 const googleClientId = process.env.GOOGLE_CLIENT_MOIN;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET_MOIN;
 const emailPass = process.env.EMAIL_PASS;
-const domain = 'https://agronomics.pk/agora/api';
+let domain = '';
 let dbUrl = "";
 let firebaseAdminSdk = "";
 let googleClientIdFrb = "";
@@ -43,12 +44,14 @@ if (NODE_ENVIRONMENT === "moin") {
     googleClientIdFrb = process.env.GOOGLE_CLIENT_ID_WEB_FRB_MOIN;
     googleClientSecretFrb = process.env.GOOGLE_CLIENT_SECRET_WEB_FRB_MOIN;
     firebaseAdminSdk = process.env.MOIN_ADMIN_SDK;
+    domain = `http://${ipAddress}:${port}/`
 }
 else if (NODE_ENVIRONMENT === "inam") {
     dbUrl = process.env.INAM_DATABASE_URL + process.env.DATABASE_NAME
     googleClientIdFrb = process.env.GOOGLE_CLIENT_ID_WEB_FRB_AGORA;
     googleClientSecretFrb = ""; // if needed then add it in .env file
     firebaseAdminSdk = process.env.AGORA_ADMIN_SDK
+    domain = `http://${ipAddress}:${port}/`
 }
 
 else if (NODE_ENVIRONMENT === "production") {
@@ -56,6 +59,7 @@ else if (NODE_ENVIRONMENT === "production") {
     googleClientIdFrb = process.env.GOOGLE_CLIENT_ID_WEB_FRB_AGORA ;
     googleClientSecretFrb = ""; // if needed then add it in .env file
     firebaseAdminSdk = process.env.AGORA_ADMIN_SDK
+    domain = `https://agronomics.pk/agora/api/`
 }
 
 export { NODE_ENVIRONMENT, port, jwtSecret, dbUrl, googleClientId, googleClientSecret, firebaseAdminSdk, googleClientIdFrb, googleClientSecretFrb, emailPass, domain };

@@ -186,14 +186,13 @@ export async function updateEvent(req, res) {
         // Handle image updates if provided
         if (req.files && req.files['images'] && req.files['images'].length > 0) {
             const images = req.files['images'];
-
             // Delete existing images associated with the event
             await EventImages.destroy({ where: { event_uuid: event.uuid } });
 
             // Map the uploaded images to EventImages model format
             const imageObjects = images.map(image => ({
                 event_uuid: event.uuid,
-                image_url: image.path
+                image_url: getRelativePath(image.path)
             }));
 
             await EventImages.bulkCreate(imageObjects);

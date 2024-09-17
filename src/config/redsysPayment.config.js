@@ -12,6 +12,10 @@ const SANDBOX = true;
 //               REDSYS CONFIG
 // ========================================
 
+const DS_MERCHANT_URLOK= `${domain}/api/payment/redsys/success`;
+const DS_MERCHANT_URLKO= `${domain}/api/payment/redsys/error`;
+const DS_MERCHANT_MERCHANTURL= `${domain}/api/payment/redsys/notification`;
+
 const getRedsysConfig = () => {
     const ipAddress = getIPAddress();
     if (SANDBOX) {
@@ -21,9 +25,9 @@ const getRedsysConfig = () => {
             DS_MERCHANT_MERCHANTCODE: '999008881',
             DS_MERCHANT_TERMINAL: '1',
             DS_MERCHANT_MERCHANTNAME: 'Agroa Dance',
-            DS_MERCHANT_URLOK: `http://${ipAddress}:${port}/api/payment/redsys/success`,
-            DS_MERCHANT_URLKO: `http://${ipAddress}:${port}/api/payment/redsys/error`,
-            DS_MERCHANT_MERCHANTURL: `http://${ipAddress}:${port}/api/payment/redsys/notification`,
+            DS_MERCHANT_URLOK,
+            DS_MERCHANT_URLKO,
+            DS_MERCHANT_MERCHANTURL,
         }
         return config
     }
@@ -34,9 +38,9 @@ const getRedsysConfig = () => {
             DS_MERCHANT_MERCHANTCODE: process.env.DS_MERCHANT_MERCHANTCODE,
             DS_MERCHANT_TERMINAL: '001',
             DS_MERCHANT_MERCHANTNAME: 'Agroa Dance',
-            DS_MERCHANT_URLOK: `${domain}/api/payment/redsys/success`,
-            DS_MERCHANT_URLKO: `${domain}/api/payment/redsys/error`,
-            DS_MERCHANT_MERCHANTURL: `${domain}/api/payment/redsys/notification`,
+            DS_MERCHANT_URLOK,
+            DS_MERCHANT_URLKO,
+            DS_MERCHANT_MERCHANTURL,
         }
         return config
     }

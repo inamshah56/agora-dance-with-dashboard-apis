@@ -161,7 +161,7 @@ export async function updateAdvertisement(req, res) {
         }
 
         if (req.file) {
-            advertisementData.image = req.file.path;
+            advertisementData.image = getRelativePath(req.file.path);
         }
 
         await Advertisement.update(advertisementData, { where: { uuid } });
