@@ -6,7 +6,7 @@ import { getIPAddress } from "../utils/utils.js";
 // ==========================================================
 
 
-const NODE_ENVIRONMENT = "production";
+const NODE_ENVIRONMENT = "moin";
 
 // ==========================================================
 //                    Check Environment Variables
@@ -24,8 +24,10 @@ const NODE_ENVIRONMENT = "production";
 // ==========================================================
 const port = process.env.SERVER_PORT || 3034;
 const jwtSecret = process.env.JWT_SECRET_KEY;
-const googleClientId = process.env.GOOGLE_CLIENT_MOIN;
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET_MOIN;
+const googleClientId = process.env.GOOGLE_CLIENT_AGORA;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET_AGORA;
+const facebookClientId = process.env.FACEBOOK_CLIENT_ID;
+const facebookClientSecret = process.env.FACEBOOK_CLIENT_SECRET;
 const emailPass = process.env.EMAIL_PASS;
 let domain = '';
 let dbUrl = "";
@@ -44,22 +46,37 @@ if (NODE_ENVIRONMENT === "moin") {
     googleClientIdFrb = process.env.GOOGLE_CLIENT_ID_WEB_FRB_MOIN;
     googleClientSecretFrb = process.env.GOOGLE_CLIENT_SECRET_WEB_FRB_MOIN;
     firebaseAdminSdk = process.env.MOIN_ADMIN_SDK;
-    domain = `http://${ipAddress}:${port}/`
+    domain = `http://${getIPAddress()}:${port}`
 }
 else if (NODE_ENVIRONMENT === "inam") {
     dbUrl = process.env.INAM_DATABASE_URL + process.env.DATABASE_NAME
     googleClientIdFrb = process.env.GOOGLE_CLIENT_ID_WEB_FRB_AGORA;
     googleClientSecretFrb = ""; // if needed then add it in .env file
     firebaseAdminSdk = process.env.AGORA_ADMIN_SDK
-    domain = `http://${ipAddress}:${port}/`
+    domain = `http://${getIPAddress()}:${port}`
 }
 
 else if (NODE_ENVIRONMENT === "production") {
     dbUrl = process.env.DATABASE_URL + process.env.DATABASE_NAME
-    googleClientIdFrb = process.env.GOOGLE_CLIENT_ID_WEB_FRB_AGORA ;
+    googleClientIdFrb = process.env.GOOGLE_CLIENT_ID_WEB_FRB_AGORA;
     googleClientSecretFrb = ""; // if needed then add it in .env file
     firebaseAdminSdk = process.env.AGORA_ADMIN_SDK
-    domain = `https://agronomics.pk/agora/api/`
+    domain = `https://agronomics.pk/agora/api`
 }
 
-export { NODE_ENVIRONMENT, port, jwtSecret, dbUrl, googleClientId, googleClientSecret, firebaseAdminSdk, googleClientIdFrb, googleClientSecretFrb, emailPass, domain };
+export {
+    NODE_ENVIRONMENT,
+    port,
+    jwtSecret,
+    dbUrl,
+    googleClientId,
+    googleClientSecret,
+    facebookClientId,
+    facebookClientSecret,
+    firebaseAdminSdk,
+    googleClientIdFrb,
+    googleClientSecretFrb,
+    emailPass,
+    domain,
+
+};
