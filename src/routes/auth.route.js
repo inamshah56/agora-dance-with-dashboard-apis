@@ -4,7 +4,8 @@ import { loginUser, registerUser, forgotPassword, verifyOtp, setNewPassword, reg
 import verifyToken from "../middlewares/authMiddleware.js";
 import passport from "passport";
 import "../strategies/googleStrategy.js";
-import { googleCallback, googleLogin } from "../controllers/oAuth.controller.js";
+import "../strategies/facebookStategy.js";
+import { facebookCallback, googleCallback, googleLogin } from "../controllers/oAuth.controller.js";
 
 
 const router = express.Router();
@@ -24,8 +25,12 @@ router.post("/verify-otp", verifyOtp);
 router.post("/new-password", setNewPassword);
 
 router.get("/web/google", passport.authenticate("google", { scope: ["profile", "email", 'https://www.googleapis.com/auth/userinfo.profile'], session: false }));
-
 router.get("/google/redirect", passport.authenticate("google", { session: false }), googleCallback);
+
+router.get("/web/fb", passport.authenticate("facebook", { session: false }));
+router.get("/fb/redirect", passport.authenticate("facebook", { session: false }), facebookCallback);
+
+
 
 router.post("/mobile/google-login", googleLogin);
 
