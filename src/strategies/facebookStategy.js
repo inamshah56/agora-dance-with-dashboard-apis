@@ -7,8 +7,8 @@ import { domain } from '../config/initialConfig.js';
 const host = NODE_ENVIRONMENT === "production" ? domain : `http://localhost:3034`;
 
 passport.use(new facebookStategy({
-    clientID: '841001461546423',
-    clientSecret: '82ecb990598d59b0f45eb6e04587373d',
+    clientID: facebookClientId,
+    clientSecret: facebookClientSecret,
     callbackURL: `${host}/api/auth/fb/redirect`,
     profileFields: ['id', 'displayName', 'email']
 },

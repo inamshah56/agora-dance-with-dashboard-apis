@@ -6,7 +6,7 @@ import { getIPAddress } from "../utils/utils.js";
 // ==========================================================
 
 
-const NODE_ENVIRONMENT = "moin";
+const NODE_ENVIRONMENT = "production";
 
 // ==========================================================
 //                    Check Environment Variables
