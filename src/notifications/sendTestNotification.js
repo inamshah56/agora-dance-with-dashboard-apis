@@ -12,6 +12,7 @@ const sendTestNotification = async (fcmToken, title, body) => {
         return response
     } catch (error) {
         console.log("Error raised while sending notification: \n", error);
+        return error
     }
 }
 export default sendTestNotification;

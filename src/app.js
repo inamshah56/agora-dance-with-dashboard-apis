@@ -81,12 +81,8 @@ app.post('/send-test-notification/', async (req, res) => {
   if (!fcmToken) {
     return res.status(400).json({ message: "FCM token is required, key is 'fcmToken'" });
   }
-  try {
-    const response = await sendTestNotification(fcmToken, "This is title", "Body of the notification");
-    res.status(200).json({ message: "Notification sent successfully", response });
-  } catch (error) {
-    res.status(500).json({ message: "Error while sending notification", error });
-  }
+  const response = await sendTestNotification(fcmToken, "This is title", "Body of the notification");
+  return res.status(200).json({ message: "Notification api called succesfully", response });
 });
 
 
