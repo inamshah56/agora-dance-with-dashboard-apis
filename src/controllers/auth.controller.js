@@ -160,7 +160,7 @@ export async function updateFcmToken(req, res) {
 
 		const { fcmToken } = req.body;
 		const userUid = req.user
-		if (!refreshToken) frontError(res, "this is required", "fcmToken")
+		if (!fcmToken) frontError(res, "this is required", "fcmToken")
 		User.update({ fcm_token: fcmToken }, { where: { uuid: userUid } })
 		return successOk(res, "Fcm Token updated Successfully");
 	} catch (error) {

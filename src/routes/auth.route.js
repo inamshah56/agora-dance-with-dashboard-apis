@@ -16,7 +16,7 @@ router.post("/login", loginUser);
 
 router.post("/regenerate-access-token", regenerateAccessToken);
 
-router.patch("fcm-token", verifyToken, updateFcmToken);
+router.patch("/fcm-token", verifyToken, updateFcmToken);
 
 router.post("/update-password", verifyToken, updatePassword);
 
