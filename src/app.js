@@ -24,6 +24,8 @@ import { getIPAddress } from "./utils/utils.js";
 
 // Initializing the app
 const app = express();
+// Trust the first proxy (Nginx)
+app.set('trust proxy', 1); // Set to true or 1 if behind a single proxy
 app.use(cookieParser());
 
 // Essential security headers with Helmet
@@ -31,10 +33,10 @@ app.use(cookieParser());
 const cspOptions = {
   directives: {
     defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "'unsafe-inline'", "https://sis-t.redsys.es:25443"],  // Example of allowing scripts from a specific domain
+    scriptSrc: ["'self'", "'unsafe-inline'", "https://sis-t.redsys.es:25443", "https://sis.redsys.es/sis/realizarPago"],  // Example of allowing scripts from a specific domain
     styleSrc: ["'self'", "'unsafe-inline'"],  // Allow inline styles, if necessary
-    imgSrc: ["'self'", "data:", "https://sis-t.redsys.es:25443"],  // Allow images from self, data URIs, and a specific domain
-    formAction: ["'self'", "https://sis-t.redsys.es:25443"],  // Allow forms to be submitted to Redsys
+    imgSrc: ["'self'", "data:", "https://sis-t.redsys.es:25443", "https://sis.redsys.es/sis/realizarPago"],  // Allow images from self, data URIs, and a specific domain
+    formAction: ["'self'", "https://sis-t.redsys.es:25443", "https://sis.redsys.es/sis/realizarPago"],  // Allow forms to be submitted to Redsys
     upgradeInsecureRequests: [],  // Auto-upgrade http to https if needed
   },
 };
@@ -54,8 +56,8 @@ app.use(compression());
 
 // Rate limiting to prevent brute-force attacks
 const limiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 100000, // limit each IP to 100 requests per windowMs
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  max: 1000, // limit each IP to 1000 requests per windowMs
 });
 app.use(limiter);
 
