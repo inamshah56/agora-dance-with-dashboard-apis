@@ -1,6 +1,6 @@
 // Import required modules and configuration
 import express from "express";
-import { loginUser, registerUser, forgotPassword, verifyOtp, setNewPassword, regenerateAccessToken, updatePassword, findUsersRealtime, getAllUsers } from "../controllers/auth.controller.js";
+import { loginUser, registerUser, forgotPassword, verifyOtp, setNewPassword, regenerateAccessToken, updatePassword, findUsersRealtime, getAllUsers, updateFcmToken } from "../controllers/auth.controller.js";
 import verifyToken from "../middlewares/authMiddleware.js";
 import passport from "passport";
 import "../strategies/googleStrategy.js";
@@ -15,6 +15,8 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 
 router.post("/regenerate-access-token", regenerateAccessToken);
+
+router.patch("fcm-token", verifyToken, updateFcmToken);
 
 router.post("/update-password", verifyToken, updatePassword);
 

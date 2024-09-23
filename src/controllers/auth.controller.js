@@ -153,6 +153,21 @@ export async function loginUser(req, res) {
 	}
 }
 
+// ========================= updateFcmToken ===========================
+
+export async function updateFcmToken(req, res) {
+	try {
+
+		const { fcmToken } = req.body;
+		const userUid = req.user
+		if (!refreshToken) frontError(res, "this is required", "fcmToken")
+		User.update({ fcm_token: fcmToken }, { where: { uuid: userUid } })
+		return successOk(res, "Fcm Token updated Successfully");
+	} catch (error) {
+		catchError(res, error);
+	}
+};
+
 // ========================= regenerateAccessToken ===========================
 
 export async function regenerateAccessToken(req, res) {
