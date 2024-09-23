@@ -56,12 +56,19 @@ else if (NODE_ENVIRONMENT === "inam") {
     domain = `http://${getIPAddress()}:${port}`
 }
 
-else if (NODE_ENVIRONMENT === "production") {
+else if (NODE_ENVIRONMENT === "agronomics") {
     dbUrl = process.env.DATABASE_URL + process.env.DATABASE_NAME
     googleClientIdFrb = process.env.GOOGLE_CLIENT_ID_WEB_FRB_AGORA;
     googleClientSecretFrb = ""; // if needed then add it in .env file
     firebaseAdminSdk = process.env.AGORA_ADMIN_SDK
     domain = `https://agronomics.pk/agora/api`
+}
+else if (NODE_ENVIRONMENT === "production") {
+    dbUrl = process.env.DATABASE_URL + process.env.DATABASE_NAME
+    googleClientIdFrb = process.env.GOOGLE_CLIENT_ID_WEB_FRB_AGORA;
+    googleClientSecretFrb = ""; // if needed then add it in .env file
+    firebaseAdminSdk = process.env.AGORA_ADMIN_SDK
+    domain = `https://agoradanceback.app`
 }
 
 export {

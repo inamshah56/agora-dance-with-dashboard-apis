@@ -4,7 +4,7 @@ import { facebookClientId, facebookClientSecret, NODE_ENVIRONMENT } from '../con
 import { domain } from '../config/initialConfig.js';
 
 // explicitly write this host line because during local development the domain contains the ip but we need the locahost.
-const host = NODE_ENVIRONMENT === "production" ? domain : `http://localhost:3034`;
+const host = NODE_ENVIRONMENT === "production" || NODE_ENVIRONMENT === "agronomics" ? domain : `http://localhost:3034`;
 
 passport.use(new facebookStategy({
     clientID: facebookClientId,
