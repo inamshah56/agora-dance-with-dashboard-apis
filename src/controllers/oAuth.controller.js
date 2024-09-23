@@ -27,7 +27,7 @@ export async function googleCallback(req, res) {
         return res.status(200).send(getTokenResponseHtml(accessToken, refreshToken));
 
     } catch (error) {
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -51,7 +51,7 @@ export async function facebookCallback(req, res) {
         const refreshToken = generateRefreshToken(user);
         return res.status(200).send(getTokenResponseHtml(accessToken, refreshToken));
     } catch (error) {
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -92,7 +92,7 @@ export async function googleLogin(req, res) {
 
     } catch (error) {
         console.log("error==================", error);
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 

@@ -108,9 +108,9 @@ export async function registerUser(req, res) {
 		if (error instanceof Sequelize.ValidationError) {
 			const errorMessage = error.errors[0].message;
 			const key = error.errors[0].path
-			validationError(res, errorMessage, key);
+			return validationError(res, errorMessage, key);
 		} else {
-			catchError(res, error);
+			return catchError(res, error);
 		}
 	}
 }
@@ -149,7 +149,7 @@ export async function loginUser(req, res) {
 		// If passwords match, return success
 		return successOkWithData(res, "Login successful", { accessToken, refreshToken });
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -164,7 +164,7 @@ export async function updateFcmToken(req, res) {
 		User.update({ fcm_token: fcmToken }, { where: { uuid: userUid } })
 		return successOk(res, "Fcm Token updated Successfully");
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 };
 
@@ -186,7 +186,7 @@ export async function regenerateAccessToken(req, res) {
 
 		return successOkWithData(res, "Access Token Generated Successfully", { accessToken: newAccessToken });
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 };
 
@@ -234,7 +234,7 @@ export async function updatePassword(req, res) {
 
 		return successOk(res, "Password updated successfully.");
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -273,7 +273,7 @@ export async function forgotPassword(req, res) {
 		return successOk(res, "OTP sent successfully")
 
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -315,7 +315,7 @@ export async function verifyOtp(req, res) {
 
 		return successOk(res, "OTP Verified Successfully");
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -356,7 +356,7 @@ export async function setNewPassword(req, res) {
 
 		return successOk(res, "Password updated successfully.");
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -385,7 +385,7 @@ export async function findUsersRealtime(req, res) {
 
 		return successOkWithData(res, "User Found successfully.", user);
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -405,6 +405,6 @@ export async function getAllUsers(req, res) {
 		}
 		return successOkWithData(res, "All Users Fetched Successfully.", user);
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }

@@ -20,7 +20,7 @@ export async function getProfile(req, res) {
         return successOkWithData(res, "User Profile Fetched Successfully", user)
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -85,7 +85,7 @@ export async function updateProfile(req, res) {
                 return validationError(res, `${uniqueConstraintError.message}.`, "email");
             }
         }
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -102,7 +102,7 @@ export async function deleteProfile(req, res) {
         return successOk(res, "User Profile Deleted Successfully")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 

@@ -40,7 +40,7 @@ export async function getAllTickets(req, res) {
         return successOkWithData(res, "Tickets Fetched Successfully", ticket)
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -148,7 +148,7 @@ export async function bookConcertTicket(req, res) {
             const errorMessage = `invalid token or token expired`;
             frontError(res, errorMessage, constraintName);
         } else {
-            catchError(res, error);
+            return catchError(res, error);
         }
     }
 }
@@ -325,7 +325,7 @@ export async function bookCongressTicket(req, res) {
             const errorMessage = `invalid token or token expired`;
             frontError(res, errorMessage, constraintName);
         } else {
-            catchError(res, error);
+            return catchError(res, error);
         }
     }
 }

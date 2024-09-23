@@ -33,7 +33,7 @@ export async function getAdvertisement(req, res) {
         return successOkWithData(res, "Advertisements Fetched Successfully", advertisement)
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -106,7 +106,7 @@ export async function createAdvertisement(req, res) {
         return successOk(res, "Advertisement created Successfully")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -169,7 +169,7 @@ export async function updateAdvertisement(req, res) {
         return successOk(res, "Advertisement Updated Successfully")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -190,6 +190,6 @@ export async function deleteAdvertisement(req, res) {
         return successOk(res, "Advertisement Deleted Successfully")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
