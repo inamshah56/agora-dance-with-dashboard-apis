@@ -5,7 +5,7 @@ import verifyToken from "../middlewares/authMiddleware.js";
 import passport from "passport";
 import "../strategies/googleStrategy.js";
 import "../strategies/facebookStategy.js";
-import { facebookCallback, googleCallback, googleLogin } from "../controllers/oAuth.controller.js";
+import { facebookCallback, googleCallback, googleLogin, facebookLogin } from "../controllers/oAuth.controller.js";
 
 
 const router = express.Router();
@@ -13,6 +13,10 @@ const router = express.Router();
 router.post("/register", registerUser);
 
 router.post("/login", loginUser);
+
+router.post("/mobile/google", googleLogin);
+
+router.post("/mobile/fb", facebookLogin);
 
 router.post("/regenerate-access-token", regenerateAccessToken);
 
@@ -34,7 +38,6 @@ router.get("/fb/redirect", passport.authenticate("facebook", { session: false })
 
 
 
-router.post("/mobile/google-login", googleLogin);
 
 router.get("/users-realtime", findUsersRealtime);
 
