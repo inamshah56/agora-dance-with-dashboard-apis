@@ -18,7 +18,6 @@ export default function verifyToken(req, res, next) {
     req.user = decoded.userUid; // userUid is uuid
     next();
   } catch (error) {
-    console.log("Token verification failed:", error);
     return UnauthorizedError(res, "Token is not valid")
   }
 }

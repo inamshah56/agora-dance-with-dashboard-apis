@@ -8,7 +8,6 @@ const sendTestNotification = async (fcmToken, title, body) => {
             event_id: "123456",
         }
         const response = await sendNotification(fcmToken, title, body, imgUrl, data);
-        console.log("Notification sends successfully", response);
         return response
     } catch (error) {
         console.log("Error raised while sending notification: \n", error);

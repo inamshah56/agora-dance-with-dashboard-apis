@@ -203,8 +203,6 @@ const createPaymentForm = (orderId, amount) => {
         DS_MERCHANT_URLOK,
         DS_MERCHANT_URLKO,
     });
-    console.log("================ form: ", form);
-    console.log("================ order_id: ", orderId);
     const htmlForm = `
     <!DOCTYPE html>
     <html>

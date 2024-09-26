@@ -32,7 +32,6 @@ export async function getAdvertisement(req, res) {
 
         return successOkWithData(res, "Advertisements Fetched Successfully", advertisement)
     } catch (error) {
-        console.log(error)
         return catchError(res, error);
     }
 }
@@ -83,12 +82,7 @@ export async function createAdvertisement(req, res) {
 
         const imagePath = getRelativePath(req.file.path);
 
-        console.log("imagePath")
-        console.log("imagePath")
-        console.log("imagePath")
-        console.log("imagePath", imagePath)
 
-        const advertisementImagePath = req.file.path;
 
         const advertisementData = {
             title,
@@ -105,7 +99,6 @@ export async function createAdvertisement(req, res) {
 
         return successOk(res, "Advertisement created Successfully")
     } catch (error) {
-        console.log(error)
         return catchError(res, error);
     }
 }
@@ -168,7 +161,6 @@ export async function updateAdvertisement(req, res) {
 
         return successOk(res, "Advertisement Updated Successfully")
     } catch (error) {
-        console.log(error)
         return catchError(res, error);
     }
 }
@@ -189,7 +181,6 @@ export async function deleteAdvertisement(req, res) {
         await advertisement.destroy();
         return successOk(res, "Advertisement Deleted Successfully")
     } catch (error) {
-        console.log(error)
         return catchError(res, error);
     }
 }

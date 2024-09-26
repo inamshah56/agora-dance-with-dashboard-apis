@@ -12,7 +12,6 @@ passport.use(new GoogleStrategy({
     callbackURL: `${host}/api/auth/google/redirect`
 },
     function (accessToken, refreshToken, profile, cb) {
-        console.log("google access toke =========: ", accessToken);
         return cb(null, profile._json);
     }
 ));

@@ -46,7 +46,9 @@ export async function googleLogin(req, res) {
         return successOkWithData(res, "Login successful", { accessToken, refreshToken });
 
     } catch (error) {
-        console.log("error==================", error);
+        if (error.message && error.message.split(":")[0] === "Invalid token signature") return frontError(res, "Invalid Google token", "googleToken");
+        if (error.message && error.message.split(",")[0] === "Token used too late") return frontError(res, "Token expired", "googleToken");
+        if (error.message && error.message.split(":")[0] === "Wrong number of segments in token") return frontError(res, "Token expired", "googleToken");
         return catchError(res, error);
     }
 }

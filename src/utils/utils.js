@@ -40,8 +40,6 @@ const validatePassword = (password) => {
     // Strong password criteria
     const strongPasswordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!strongPasswordRegex.test(password)) {
-        console.log(strongPasswordRegex.test(password));
-        console.log("passowrd is not strong");
         return "Password must contain at least one uppercase letter, one numeric digit and one special character.";
     }
 };

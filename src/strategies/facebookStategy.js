@@ -14,7 +14,6 @@ passport.use(new facebookStategy({
     profileFields: ['id', 'name']
 },
     function (accessToken, refreshToken, profile, cb) {
-        console.log("fb access toke =========: ", accessToken);
         return cb(null, profile._json);
     }
 ));

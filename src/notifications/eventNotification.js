@@ -9,7 +9,6 @@ import sendNotification from "./sendNotification.js";
 const eventInTwoDaysNotification_ForTicektHolder = async () => {
     const dayAfterTomorrow = new Date();
     dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-    console.log("dayAfterTomorrow: ", dayAfterTomorrow)
     let events = await Event.findAll({
         where: { date: dayAfterTomorrow },
         attributes: ["uuid", "title", "date", "time"],
@@ -44,7 +43,6 @@ const eventInTwoDaysNotification_ForTicektHolder = async () => {
             // send notifications with evetn title date and image
             try {
                 const response = await sendNotification(ticket.user.fcm_token, title, message, null, data)
-                console.log("response: ============================================ ", response)
             }
             catch (err) {
                 console.log("Error: ", err)
@@ -87,8 +85,6 @@ const eventInTwoDaysNotification_ForFavouriteEvents = async () => {
         }
     })
     events = JSON.parse(JSON.stringify(events))
-    console.log("event: \n", events)
-    console.log("event_favorite: \n", events[0].favourite_events)
     for (const event of events) {
         const title = "Don’t miss out: book your ticket now";
         const message = `${event.title} is in two days, on ${event.date} at ${event.time}. Book the ticket to secure your seats.`;
@@ -99,7 +95,6 @@ const eventInTwoDaysNotification_ForFavouriteEvents = async () => {
             // send notifications with evetn title date and image
             try {
                 const response = await sendNotification(favEvent.user.fcm_token, title, message, null, data)
-                console.log("response: ============================================ ", response)
             }
             catch (err) {
                 console.log("Error: ", err)

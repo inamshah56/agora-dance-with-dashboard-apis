@@ -3,7 +3,6 @@ import { jwtSecret } from "../config/initialConfig.js";
 
 // Function to generate access token
 const generateAccessToken = (user) => {
-    console.log(jwtSecret);
 
     return jwt.sign({ userUid: user.uuid }, jwtSecret, {
         expiresIn: "30d",
@@ -18,7 +17,6 @@ const generateRefreshToken = (user) => {
 };
 
 const verifyRefreshToken = (refreshToken) => {
-    console.log(jwtSecret);
     try {
 
         return jwt.verify(refreshToken, jwtSecret);

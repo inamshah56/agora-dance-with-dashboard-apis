@@ -20,6 +20,7 @@ if (!process.env.FACEBOOK_CLIENT_ID) throw new Error("Missing FACEBOOK_CLIENT_ID
 if (!process.env.FACEBOOK_CLIENT_SECRET) throw new Error("Missing FACEBOOK_CLIENT_SECRET in environment env file");
 if (!process.env.AGORA_ADMIN_SDK) throw new Error("Missing AGORA_ADMIN_SDK in environment env file");
 if (!process.env.EMAIL_PASS) throw new Error("Missing EMAIL_PASS in environment env file email will not work properly");
+if (NODE_ENVIRONMENT === "production" && !process.env.DOMAIN) throw new Error("Missing DOMAIN in environment env file");
 
 // ==========================================================
 //                     Configuration Variables
@@ -33,7 +34,7 @@ const facebookClientId = process.env.FACEBOOK_CLIENT_ID;
 const facebookClientSecret = process.env.FACEBOOK_CLIENT_SECRET;
 const firebaseAdminSdk = process.env.AGORA_ADMIN_SDK;
 const emailPass = process.env.EMAIL_PASS;
-const domain = NODE_ENVIRONMENT === "local" ? `http://${getIPAddress()}:${port}` : `https://agoradanceback.app`;
+const domain = NODE_ENVIRONMENT === "local" ? `http://${getIPAddress()}:${port}` : process.env.DOMAIN;
 
 
 
