@@ -19,13 +19,14 @@ if (!process.env.GOOGLE_CLIENT_SECRET) throw new Error("Missing GOOGLE_CLIENT_SE
 if (!process.env.FACEBOOK_CLIENT_ID) throw new Error("Missing FACEBOOK_CLIENT_ID in environment");
 if (!process.env.FACEBOOK_CLIENT_SECRET) throw new Error("Missing FACEBOOK_CLIENT_SECRET in environment env file");
 if (!process.env.AGORA_ADMIN_SDK) throw new Error("Missing AGORA_ADMIN_SDK in environment env file");
+if (!process.env.PORT) throw new Error("Missing PORT in environment env file");
 if (!process.env.EMAIL_PASS) throw new Error("Missing EMAIL_PASS in environment env file email will not work properly");
 if (NODE_ENVIRONMENT === "production" && !process.env.DOMAIN) throw new Error("Missing DOMAIN in environment env file");
 
 // ==========================================================
 //                     Configuration Variables
 // ==========================================================
-const port = process.env.SERVER_PORT;
+const port = process.env.PORT;
 const dbUrl = process.env.DATABASE_URL + process.env.DATABASE_NAME;
 const jwtSecret = process.env.JWT_SECRET_KEY;
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
