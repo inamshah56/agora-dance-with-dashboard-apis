@@ -230,7 +230,8 @@ export async function bookCongressTicket(req, res) {
         // IF ROOMES ARE BOOKED
         if (noOfRooms && roomUuidsArray) {
             if (noOfRooms !== roomUuidsArray.length) return frontError(res, "noOfRooms doesn't match the info in roomUuidArray")
-
+            if (!noOfNights) return validationError(res, "noOfNights is required if rooms to book room.", "noOfNights")
+            if (noOfNights < 1) return validationError(res, "noOfNights should be greater than 0", "noOfNights")
             let room = await Room.findAll({
                 where: {
                     uuid: {
