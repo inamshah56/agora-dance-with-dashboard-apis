@@ -34,7 +34,20 @@ const storage = diskStorage({
     },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+    storage,
+    limits: { fileSize: 12 * 1024 * 1024 }, // Limit file size to 20MB
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|gif|mpquicktime|heic/i;
+        const mimetype = filetypes.test(file.mimetype);
+
+        if (mimetype) {
+            return cb(null, true);
+        } else {
+            cb(new Error("Unsupported file format"));
+        }
+    }
+});
 
 const router = express.Router();
 
