@@ -36,7 +36,7 @@ export async function googleLogin(req, res) {
                 last_name: family_name,
                 email: email,
                 password: "AB#123897",
-                fcm_token, fcmToken,
+                fcm_token: fcmToken,
 
             });
 
