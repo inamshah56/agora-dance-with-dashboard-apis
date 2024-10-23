@@ -57,7 +57,6 @@ export async function registerUser(req, res) {
 			"lastName",
 			"dob",
 			"gender",
-			"phone",
 			"email",
 			"password",
 			"confirmPassword",
@@ -83,9 +82,10 @@ export async function registerUser(req, res) {
 
 		const invalidPassword = validatePassword(password)
 		if (invalidPassword) return validationError(res, invalidPassword)
-
-		const invalidPhone = validatePhone(phone)
-		if (invalidPhone) return validationError(res, invalidPhone)
+		if (phone) {
+			const invalidPhone = validatePhone(phone)
+			if (invalidPhone) return validationError(res, invalidPhone)
+		}
 
 		if (password !== confirmPassword) {
 			throw new Error('Password and Confirm Password do not match.');
