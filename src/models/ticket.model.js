@@ -33,6 +33,10 @@ const Ticket = sequelize.define('ticket', {
     total_amount: {
         type: DataTypes.FLOAT
     },
+    discounted_amount: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+    },
     paid: {
         type: DataTypes.BOOLEAN,
         defaultValue: false

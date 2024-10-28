@@ -120,6 +120,15 @@ const conflictError = (res, message) => {
     });
 };
 
+// ========================= sequelizeValidationError ========================
+
+
+const sequelizeValidationError = (res, error) => {
+    const errorMessage = error.errors[0].message;
+    const key = error.errors[0].path
+    return validationError(res, errorMessage, key);
+};
+
 // ================================================================
 
 export {
@@ -134,5 +143,6 @@ export {
     notFound,
     conflictError,
     UnauthorizedError,
-    forbiddenError
+    forbiddenError,
+    sequelizeValidationError
 };

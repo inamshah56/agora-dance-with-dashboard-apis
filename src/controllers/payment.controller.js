@@ -4,6 +4,7 @@ import { Ticket } from "../models/ticket.model.js";
 import { getRedsysConfig } from "../config/redsysPayment.config.js";
 const { urls, secretKey, DS_MERCHANT_MERCHANTCODE, DS_MERCHANT_TERMINAL, DS_MERCHANT_URLOK, DS_MERCHANT_URLKO, DS_MERCHANT_MERCHANTURL, DS_MERCHANT_MERCHANTNAME } = getRedsysConfig();
 import { createJsDate } from "../utils/utils.js";
+import Coupon from "../models/coupon.model.js";
 
 const { createRedirectForm, processRestNotification, } = createRedsysAPI({
     urls: urls,
@@ -31,7 +32,7 @@ const redsysPaymentTest = async (req, res) => {
 
 // ========================= RedsysPayment ===========================
 const redsysPayment = async (req, res) => {
-    const { ticketUid } = req.query;
+    const { ticketUid, couponCode } = req.query;
     if (!ticketUid) {
         return frontError(res, "Ticket UID is required", "ticketUid");
     }
@@ -39,7 +40,7 @@ const redsysPayment = async (req, res) => {
         const ticket = await Ticket.findOne(
             {
                 where: { uuid: ticketUid },
-                attributes: ['uuid', 'total_amount', 'order_id', 'paid']
+                attributes: ['uuid', 'total_amount', 'discounted_amount', 'order_id', 'paid']
             });
         if (!ticket) {
             const responseHtml = getPaymentErrorHtml("Ticket not found", "frontend");
@@ -53,19 +54,37 @@ const redsysPayment = async (req, res) => {
         // IF NOT PAID BUT ORDER ID EXISTS
         if (ticket.order_id) {
             // INQUIRY STATUS OF THE TRANSACTION WITH THIS ORDER_ID
-            const responseHtml = createPaymentForm(ticket.order_id, ticket.total_amount);
+            let ticketAmount = ticket.discounted_amount;
+            const responseHtml = createPaymentForm(ticket.order_id, ticketAmount);
             return res.status(200).send(responseHtml);
         }
 
         // ELSE CREATE NEW PAYMENT REQUEST WITH NEW ORDER ID
         const orderId = randomTransactionId();
+        let ticketAmount = ticket.total_amount;
+
+        // IF COUPAN CODE APPLY DISCOUNT
+        if (couponCode) {
+            const coupon = await Coupon.findOne({ where: { code: couponCode } });
+            if (!coupon) {
+                const responseHtml = getPaymentErrorHtml("Invalid coupon code", "user");
+                return res.status(200).send(responseHtml);
+            }
+            if (coupon.expiry < new Date()) {
+                const responseHtml = getPaymentErrorHtml("Coupon has expired", "user");
+                return res.status(200).send(responseHtml);
+            }
+            ticketAmount = ticketAmount - (ticketAmount * coupon.discount_percent / 100);
+        }
+
+        // SAVE ORDER ID TO TICKET & DISCOUNTED AMOUNT
+        ticket.discounted_amount = ticketAmount;
         ticket.order_id = orderId;
         await ticket.save();
 
-        const responseHtml = createPaymentForm(orderId, ticket.total_amount);
+        const responseHtml = createPaymentForm(orderId, ticketAmount);
         return res.status(200).send(responseHtml);
     } catch (error) {
-        console.log("============== error in payment initiation request ==============:\n ", error);
         const responseHtml = getPaymentErrorHtml("Soemthing went wrong, please try later", "backend");
         return res.status(200).send(responseHtml);
     }
@@ -107,7 +126,6 @@ const redsysPaymentSuccess = async (req, res) => {
         return res.status(200).send(responseHtml);
     }
     catch (error) {
-        console.log("================ error in error request: ", error);
         const responseHtml = getPaymentErrorHtml("Something went wrong, please try again", "backend");
         return res.status(200).send(responseHtml);
     }
@@ -146,7 +164,6 @@ const redsysPaymentError = async (req, res) => {
         return res.status(200).send(htmlResponse);
     }
     catch (error) {
-        console.log("================ error in error request: ", error);
         const responseHtml = getPaymentErrorHtml("Something went wrong, please try again", "backend");
         return res.status(200).send(responseHtml);
     }

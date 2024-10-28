@@ -10,17 +10,27 @@ import cookieParser from "cookie-parser";
 import { NODE_ENVIRONMENT, port } from "./config/initialConfig.js";
 import { connectDB } from "./config/dbConfig.js";
 import "./models/models.js";
+import path from "path"
+import { fileURLToPath } from 'url';
+import sendTestNotification from "./notifications/sendTestNotification.js";
+import { getIPAddress } from "./utils/utils.js";
+import os from "os"
+
+// ================================================
+//                  Importing routes
+// ================================================
 import authRoutes from "./routes/auth.route.js"; // Make sure you have this import for auth routes
 import eventRoutes from "./routes/event.route.js";
 import ticketRoutes from "./routes/ticket.route.js";
 import profileRoutes from "./routes/profile.route.js";
 import advertisementRoutes from "./routes/advertisement.route.js";
 import paymentRoutes from "./routes/payment.routes.js";
-import os from "os"
-import path from "path"
-import { fileURLToPath } from 'url';
-import sendTestNotification from "./notifications/sendTestNotification.js";
-import { getIPAddress } from "./utils/utils.js";
+import couponRoutes from "./routes/coupon.route.js";
+
+
+// ================================================
+//                  Configurations
+// ================================================
 
 // Initializing the app
 const app = express();
@@ -88,14 +98,16 @@ app.post('/send-test-notification/', async (req, res) => {
 
 
 
-
-// routes
+// ================================================
+//                  Routes
+// ================================================
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes)
 app.use("/api/event", eventRoutes)
 app.use("/api/ticket", ticketRoutes)
 app.use("/api/advertisement", advertisementRoutes)
 app.use("/api/payment", paymentRoutes)
+app.use("/api/coupon", couponRoutes)
 
 // Global error handler
 app.use((err, req, res, next) => {
