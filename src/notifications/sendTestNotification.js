@@ -4,14 +4,14 @@ const sendTestNotification = async (fcmToken, title, body) => {
     try {
         const imgUrl = 'https://images.rawpixel.com/image_social_portrait/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTExL3JtNzg0LXJlbWl4LWFkai0wMTUtYS5qcGc.jpg'
         const data = {
-            home: "home",
-            category: "category",
+            nav_screen: "Notifications",
+            event_id: "123456",
         }
         const response = await sendNotification(fcmToken, title, body, imgUrl, data);
-        console.log("Notification sends successfully", response);
         return response
     } catch (error) {
         console.log("Error raised while sending notification: \n", error);
+        return error
     }
 }
 export default sendTestNotification;

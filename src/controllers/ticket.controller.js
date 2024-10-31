@@ -16,7 +16,7 @@ export async function getAllTickets(req, res) {
                 user_uuid: req.user
             },
             attributes: {
-                exclude: ['date', 'no_of_rooms', 'beds', 'food', 'paid', 'createdAt', 'updatedAt', 'event_uuid', 'user_uuid', 'pass_uuid']
+                exclude: ['date', 'no_of_rooms', 'beds', 'food', 'createdAt', 'updatedAt', 'event_uuid', 'user_uuid', 'pass_uuid']
             },
             include: [
                 {
@@ -40,7 +40,7 @@ export async function getAllTickets(req, res) {
         return successOkWithData(res, "Tickets Fetched Successfully", ticket)
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -135,7 +135,7 @@ export async function bookConcertTicket(req, res) {
 
         await Person.bulkCreate(personsWithTicketUuid)
 
-        return successOk(res, "Ticket Booked Successfully")
+        return successOkWithData(res, "Ticket Booked Successfully", { ticketUuid: ticketUuid })
     } catch (error) {
         console.log(error)
         if (error.name === 'SequelizeDatabaseError') {
@@ -148,7 +148,7 @@ export async function bookConcertTicket(req, res) {
             const errorMessage = `invalid token or token expired`;
             frontError(res, errorMessage, constraintName);
         } else {
-            catchError(res, error);
+            return catchError(res, error);
         }
     }
 }
@@ -160,11 +160,11 @@ export async function bookCongressTicket(req, res) {
         const reqBodyFields = bodyReqFields(req, res, [
             "eventUuid",
             "passUuid",
-            "roomUuidsArray",
             "noOfPersons",
-            "noOfNights",
-            "noOfRooms",
-            "foodType",
+            // "roomUuidsArray",
+            // "noOfRooms",
+            // "noOfNights",
+            // "foodType",
             "totalAmount",
             "personsInfoArray",
         ]);
@@ -207,7 +207,7 @@ export async function bookCongressTicket(req, res) {
         const availableTickets = event.total_tickets - ticketCount
         if (availableTickets === 0) return successOk(res, "Booking Closed. No Tickets Available")
 
-        if (foodType !== 'breakfast' && foodType !== 'fullboard') {
+        if (foodType && foodType !== 'breakfast' && foodType !== 'fullboard') {
             return frontError(res, 'foodType must be either breakfast or fullboard', 'foodType');
         }
 
@@ -225,50 +225,72 @@ export async function bookCongressTicket(req, res) {
 
         if (pass.pass_type !== 'full pass') return frontError(res, "Only Full Pass for Congress can be Booked here")
 
-        if (noOfRooms !== roomUuidsArray.length) return frontError(res, "noOfRooms doesn't match the info in roomUuidArray")
-
-        let room = await Room.findAll({
-            where: {
-                uuid: {
-                    [Op.in]: roomUuidsArray,
+        let roomInfo = null;
+        let foodInfo = null;
+        // IF ROOMES ARE BOOKED
+        if (noOfRooms && roomUuidsArray) {
+            if (noOfRooms !== roomUuidsArray.length) return frontError(res, "noOfRooms doesn't match the info in roomUuidArray")
+            if (!noOfNights) return validationError(res, "noOfNights is required if rooms to book room.", "noOfNights")
+            if (noOfNights < 1) return validationError(res, "noOfNights should be greater than 0", "noOfNights")
+            let room = await Room.findAll({
+                where: {
+                    uuid: {
+                        [Op.in]: roomUuidsArray,
+                    }
+                },
+                attributes: {
+                    exclude: ['createdAt', 'updatedAt', 'event_uuid']
                 }
-            },
-            attributes: {
-                exclude: ['createdAt', 'updatedAt', 'event_uuid']
-            }
-        })
+            })
 
-        if (!room || (Array.isArray(room) && room.length === 0)) {
-            return frontError(res, 'Invalid roomUuidsArray. No Room Found for roomUuidArray.', 'roomUuidsArray');
+            if (!room || (Array.isArray(room) && room.length === 0)) {
+                return frontError(res, 'Invalid roomUuidsArray. No Room Found for roomUuidArray.', 'roomUuidsArray');
+            }
+            room = JSON.parse(JSON.stringify(room))
+            roomInfo = [];
+            for (const uuid of roomUuidsArray) {
+                for (const roomObj of room) {
+                    if (uuid === roomObj.uuid) {
+                        roomInfo.push(roomObj)
+                        break
+                    }
+                }
+            }
         }
 
-        room = JSON.parse(JSON.stringify(room))
-
-        // if (room.length !== roomUuidsArray.length) return frontError(res, "Invalid roomUuidsArray. Contain roomUuid that doesn't Exist.")
-
-        const food = await Food.findOne({
-            where: {
-                event_uuid: eventUuid
-            },
-            attributes: {
-                exclude: ['createdAt', 'updatedAt', 'event_uuid']
+        // IF FOOD IS BOOKED
+        if (foodType) {
+            const food = await Food.findOne({
+                where: {
+                    event_uuid: eventUuid
+                },
+                attributes: {
+                    exclude: ['createdAt', 'updatedAt', 'event_uuid']
+                }
+            })
+            if (!food) {
+                return frontError(res, 'Invalid food data.'); // modify msg
             }
-        })
-        if (!food) {
-            return validationError(res, 'Food Prices Were Not Added'); // modify msg
+            foodInfo = JSON.parse(JSON.stringify(food))
         }
 
         // CALCULATING TICKET AMOUNT 
+        // IF ROOMES ARE BOOKED
         let roomAmount = 0;
-        for (const bed in room) {
-            roomAmount += room[bed].price_per_night * noOfNights
+        if (roomInfo) {
+            for (const bed in roomInfo) {
+                roomAmount += roomInfo[bed].price_per_night * noOfNights
+            }
         }
 
+        // IF FOOD IS BOOKED
         let foodAmount = 0
-        if (foodType === 'breakfast') {
-            foodAmount = food.breakfast_price * noOfPersons
-        } else {
-            foodAmount = food.allboard_price * noOfPersons
+        if (foodInfo) {
+            if (foodType === 'breakfast') {
+                foodAmount = foodInfo.breakfast_price * noOfPersons
+            } else {
+                foodAmount = foodInfo.allboard_price * noOfPersons
+            }
         }
         // const passType = pass.pass_type
         let passAmount = pass.price * noOfPersons
@@ -280,11 +302,13 @@ export async function bookCongressTicket(req, res) {
         }
 
         let bedString = ''
-        for (const bed in room) {
-            bedString += room[bed].bed + ', '
+        if (roomInfo) {
+            for (const bed in roomInfo) {
+                bedString += roomInfo[bed].bed + ', '
+            }
+            bedString = bedString.slice(0, -2)
         }
 
-        bedString = bedString.slice(0, -2)
 
         const ticketData = {
             date: Date.now(),
@@ -312,7 +336,7 @@ export async function bookCongressTicket(req, res) {
 
         await Person.bulkCreate(personsWithTicketUuid)
 
-        return successOk(res, "Ticket Booked Successfully")
+        return successOkWithData(res, "Ticket Booked Successfully", { ticketUuid: ticketUuid })
     } catch (error) {
         console.log(error)
         if (error.name === 'SequelizeDatabaseError') {
@@ -325,7 +349,7 @@ export async function bookCongressTicket(req, res) {
             const errorMessage = `invalid token or token expired`;
             frontError(res, errorMessage, constraintName);
         } else {
-            catchError(res, error);
+            return catchError(res, error);
         }
     }
 }

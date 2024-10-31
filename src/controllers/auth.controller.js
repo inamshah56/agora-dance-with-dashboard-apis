@@ -17,6 +17,7 @@ import {
 	conflictError,
 	notFound
 } from "../utils/responses.js";
+import { emailPass } from "../config/initialConfig.js";
 
 // ========================= nodemailer configuration ===========================
 
@@ -25,7 +26,7 @@ const transporter = nodemailer.createTransport({
 	service: 'gmail',
 	auth: {
 		user: 'agoradance.app@gmail.com',
-		pass: process.env.EMAIL_PASS
+		pass: emailPass
 	}
 });
 
@@ -56,7 +57,6 @@ export async function registerUser(req, res) {
 			"lastName",
 			"dob",
 			"gender",
-			"phone",
 			"email",
 			"password",
 			"confirmPassword",
@@ -82,9 +82,10 @@ export async function registerUser(req, res) {
 
 		const invalidPassword = validatePassword(password)
 		if (invalidPassword) return validationError(res, invalidPassword)
-
-		const invalidPhone = validatePhone(phone)
-		if (invalidPhone) return validationError(res, invalidPhone)
+		if (phone) {
+			const invalidPhone = validatePhone(phone)
+			if (invalidPhone) return validationError(res, invalidPhone)
+		}
 
 		if (password !== confirmPassword) {
 			throw new Error('Password and Confirm Password do not match.');
@@ -107,9 +108,9 @@ export async function registerUser(req, res) {
 		if (error instanceof Sequelize.ValidationError) {
 			const errorMessage = error.errors[0].message;
 			const key = error.errors[0].path
-			validationError(res, errorMessage, key);
+			return validationError(res, errorMessage, key);
 		} else {
-			catchError(res, error);
+			return catchError(res, error);
 		}
 	}
 }
@@ -148,9 +149,24 @@ export async function loginUser(req, res) {
 		// If passwords match, return success
 		return successOkWithData(res, "Login successful", { accessToken, refreshToken });
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
+
+// ========================= updateFcmToken ===========================
+
+export async function updateFcmToken(req, res) {
+	try {
+
+		const { fcmToken } = req.body;
+		const userUid = req.user
+		if (!fcmToken) frontError(res, "this is required", "fcmToken")
+		User.update({ fcm_token: fcmToken }, { where: { uuid: userUid } })
+		return successOk(res, "Fcm Token updated Successfully");
+	} catch (error) {
+		return catchError(res, error);
+	}
+};
 
 // ========================= regenerateAccessToken ===========================
 
@@ -170,7 +186,7 @@ export async function regenerateAccessToken(req, res) {
 
 		return successOkWithData(res, "Access Token Generated Successfully", { accessToken: newAccessToken });
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 };
 
@@ -218,7 +234,7 @@ export async function updatePassword(req, res) {
 
 		return successOk(res, "Password updated successfully.");
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -257,7 +273,7 @@ export async function forgotPassword(req, res) {
 		return successOk(res, "OTP sent successfully")
 
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -299,7 +315,7 @@ export async function verifyOtp(req, res) {
 
 		return successOk(res, "OTP Verified Successfully");
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -340,7 +356,7 @@ export async function setNewPassword(req, res) {
 
 		return successOk(res, "Password updated successfully.");
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -369,7 +385,7 @@ export async function findUsersRealtime(req, res) {
 
 		return successOkWithData(res, "User Found successfully.", user);
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }
 
@@ -389,6 +405,6 @@ export async function getAllUsers(req, res) {
 		}
 		return successOkWithData(res, "All Users Fetched Successfully.", user);
 	} catch (error) {
-		catchError(res, error);
+		return catchError(res, error);
 	}
 }

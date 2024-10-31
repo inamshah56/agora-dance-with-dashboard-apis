@@ -33,7 +33,7 @@ export async function getEvent(req, res) {
         return successOkWithData(res, "Event Fetched Successfully", event.dataValues)
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -51,6 +51,7 @@ export async function addEvent(req, res) {
             "totalTickets",
             "lat",
             "lon",
+            "address",
             "city",
             "province",
             "organizer",
@@ -70,6 +71,7 @@ export async function addEvent(req, res) {
             totalTickets,
             lat,
             lon,
+            address,
             city,
             province,
             organizer,
@@ -94,6 +96,7 @@ export async function addEvent(req, res) {
                 type: 'Point',
                 coordinates: [lat, lon]
             },
+            address,
             city,
             province,
             organizer,
@@ -123,7 +126,7 @@ export async function addEvent(req, res) {
             const key = error.errors[0].path
             validationError(res, errorMessage, key);
         } else {
-            catchError(res, error);
+            return catchError(res, error);
         }
     }
 }
@@ -152,6 +155,7 @@ export async function updateEvent(req, res) {
             totalTickets,
             lat,
             lon,
+            address,
             city,
             province,
             organizer,
@@ -169,6 +173,7 @@ export async function updateEvent(req, res) {
                 type: 'Point',
                 coordinates: [lat, lon]
             },
+            address,
             city,
             province,
             organizer,
@@ -186,14 +191,13 @@ export async function updateEvent(req, res) {
         // Handle image updates if provided
         if (req.files && req.files['images'] && req.files['images'].length > 0) {
             const images = req.files['images'];
-
             // Delete existing images associated with the event
             await EventImages.destroy({ where: { event_uuid: event.uuid } });
 
             // Map the uploaded images to EventImages model format
             const imageObjects = images.map(image => ({
                 event_uuid: event.uuid,
-                image_url: image.path
+                image_url: getRelativePath(image.path)
             }));
 
             await EventImages.bulkCreate(imageObjects);
@@ -202,7 +206,7 @@ export async function updateEvent(req, res) {
         return successOkWithData(res, "Event Updated Successfully")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -223,7 +227,7 @@ export async function deleteEvent(req, res) {
         return successOk(res, "Event Deleted Successfully")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -309,7 +313,7 @@ export async function getFilteredEvents(req, res) {
         return successOkWithData(res, "Filtered Events Fetched Successfully", event);
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -377,7 +381,7 @@ export async function getEventBookingDetails(req, res) {
         return successOkWithData(res, "Data Fetched", { passesData, roomsData, foodData })
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -462,7 +466,7 @@ export async function getAllFavourites(req, res) {
         return successOkWithData(res, "All Favourite Events Fetched Successfully", favouriteEvents)
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -477,7 +481,11 @@ export async function addToFavourites(req, res) {
             return frontError(res, 'this is required', "eventUuid")
         }
 
-        const alreadyInFavouriteEvents = await FavouriteEvents.findOne({ event_uuid: eventUuid })
+        const alreadyInFavouriteEvents = await FavouriteEvents.findOne({
+            where: {
+                event_uuid: eventUuid, user_uuid: userUid
+            }
+        })
 
         if (alreadyInFavouriteEvents) return validationError(res, "Event already added in Favourite Events")
 
@@ -486,7 +494,7 @@ export async function addToFavourites(req, res) {
         return successOkWithData(res, "Event Added to Favourites", addedtoFavourites)
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -509,7 +517,7 @@ export async function removeFromFavourites(req, res) {
         return successOk(res, "Event Removed from Favourites")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -575,7 +583,7 @@ export async function addConcertPass(req, res) {
         return created(res, "Concert Pass Created Successfully")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -636,7 +644,7 @@ export async function addCongressPass(req, res) {
         return created(res, "Congress Pass Created Successfully")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -695,7 +703,7 @@ export async function addCongressRooms(req, res) {
         return created(res, "Congress Rooms Added Successfully")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 
@@ -751,7 +759,7 @@ export async function addCongressFood(req, res) {
         return created(res, "Congress Food Prices Added Successfully")
     } catch (error) {
         console.log(error)
-        catchError(res, error);
+        return catchError(res, error);
     }
 }
 

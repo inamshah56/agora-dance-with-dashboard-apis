@@ -1,9 +1,10 @@
 import admin from 'firebase-admin';
-
-
-const filePath = process.env.AGORA_ADMIN_SDK;
-const serviceAccount = await import(filePath, {
-    assert: { type: 'json' }
+import { firebaseAdminSdk } from './initialConfig.js';
+// import serviceAccount from "../../agoradance-d8d90-firebase-adminsdk-tm95v-ff08c3aa1e.json" with { "type": "json" }
+const serviceAccount = await import(firebaseAdminSdk, {
+    assert: {
+        type: "json",
+    },
 });
 admin.initializeApp({
     // un comment the below line during deployment after setting the 

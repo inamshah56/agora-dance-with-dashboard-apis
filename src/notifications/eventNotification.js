@@ -3,56 +3,74 @@ import { Ticket } from "../models/ticket.model.js";
 import { FavouriteEvents } from "../models/event.model.js";
 import { User } from "../models/user.model.js";
 import { Op } from "sequelize";
+import sendNotification from "./sendNotification.js";
 
 
 const eventInTwoDaysNotification_ForTicektHolder = async () => {
-    const beforeYesterday = new Date();
-    beforeYesterday.setDate(beforeYesterday.getDate() - 2);
-    let events = Event.findAll({
-        where: { date: beforeYesterday },
-        attributes: ["uid", "title", "date", "time"],
-        include:
-        {
-            model: Ticket,
-            as: "event_ticket",
-            attributes: ["uid"],
-            include: {
-                model: User,
-                as: "user",
-                attributes: ["fcm_token"],
-                where: {
-                    fcm_token: {
-                        [Op.ne]: null
+    const dayAfterTomorrow = new Date();
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+    let events = await Event.findAll({
+        where: { date: dayAfterTomorrow },
+        attributes: ["uuid", "title", "date", "time"],
+        include: [
+            {
+                model: Ticket,
+                as: "event_ticket",
+                attributes: ["uuid"],
+                required: true,
+                include: {
+                    model: User,
+                    as: "user",
+                    attributes: ["fcm_token"],
+                    where: {
+                        fcm_token: {
+                            [Op.ne]: null
+                        }
                     }
-                }
 
+                }
             }
-        }
+        ]
     })
     events = JSON.parse(JSON.stringify(events))
-    console.log("event: \n", events)
     for (const event of events) {
-        // send notifications with evetn title date and image
+        const title = "Event reminder";
+        const message = `${event.title} is in two days, on ${event.date} at ${event.time}. Don't forget to attend the event.`;
+        const data = { "event_uuid": event.uuid, navScreen: "Event_Detail" }
+
+        const eventTickets = event.event_ticket;
+        for (const ticket of eventTickets) {
+            // send notifications with evetn title date and image
+            try {
+                const response = await sendNotification(ticket.user.fcm_token, title, message, null, data)
+            }
+            catch (err) {
+                console.log("Error: ", err)
+            }
+        }
     }
 
 }
 
-eventInTwoDaysNotification_ForTicektHolder();
+
+
+// eventInTwoDaysNotification_ForTicektHolder();
 
 // ========================================
 
 const eventInTwoDaysNotification_ForFavouriteEvents = async () => {
-    const beforeYesterday = new Date();
-    beforeYesterday.setDate(beforeYesterday.getDate() - 2);
-    let events = Event.findAll({
-        where: { date: beforeYesterday },
-        attributes: ["uid", "title", "date", "time"],
+    const dayAfterTomorrow = new Date();
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+    let events = await Event.findAll({
+        where: { date: dayAfterTomorrow },
+        attributes: ["uuid", "title", "date", "time"],
 
         include:
         {
             model: FavouriteEvents,
             as: "favourite_events",
-            attributes: ["uid"],
+            attributes: ["uuid"],
+            required: true,
             include: {
                 model: User,
                 as: "user",
@@ -67,11 +85,27 @@ const eventInTwoDaysNotification_ForFavouriteEvents = async () => {
         }
     })
     events = JSON.parse(JSON.stringify(events))
-    console.log("event: \n", events)
     for (const event of events) {
-        // send notifications with evetn title date and image
+        const title = "Don’t miss out: book your ticket now";
+        const message = `${event.title} is in two days, on ${event.date} at ${event.time}. Book the ticket to secure your seats.`;
+        const data = { "event_uuid": event.uuid, navScreen: "Event_Detail" }
+
+        const favouriteEvents = event.favourite_events;
+        for (const favEvent of favouriteEvents) {
+            // send notifications with evetn title date and image
+            try {
+                const response = await sendNotification(favEvent.user.fcm_token, title, message, null, data)
+            }
+            catch (err) {
+                console.log("Error: ", err)
+            }
+        }
     }
 }
+
+// eventInTwoDaysNotification_ForFavouriteEvents();
+
+export { eventInTwoDaysNotification_ForTicektHolder, eventInTwoDaysNotification_ForFavouriteEvents };
 
 // Add the notificatin method when the event is added in the certain city for the users;
 // Send notification when the event is added ask from tayyab

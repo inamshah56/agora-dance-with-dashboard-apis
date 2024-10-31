@@ -46,6 +46,9 @@ const Event = sequelize.define('event', {
         allowNull: true,
         defaultValue: null,
     },
+    address: {
+        type: DataTypes.STRING
+    },
     city: {
         type: DataTypes.STRING
     },
